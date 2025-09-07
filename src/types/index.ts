@@ -6,6 +6,7 @@ export interface Note {
   plainTextContent?: string; // Plain text version for search
   isPinned: boolean;
   isEncrypted: boolean;
+  hasBeenEncrypted: boolean; // Track if note has ever been encrypted
   encryptedData?: string; // Encrypted content
   tags: string[];
   createdAt: Date;

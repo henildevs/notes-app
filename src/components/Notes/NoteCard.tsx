@@ -40,7 +40,12 @@ const NoteCard: React.FC<NoteCardProps> = ({
   const formatDate = (date: Date) => {
     const d = new Date(date);
     const now = new Date();
-    const diffTime = Math.abs(now.getTime() - d.getTime());
+    
+    // Reset time to start of day for accurate day comparison
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const noteDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    
+    const diffTime = today.getTime() - noteDate.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays === 0) return 'Today';
@@ -71,9 +76,6 @@ const NoteCard: React.FC<NoteCardProps> = ({
 
   // Get display title
   const getDisplayTitle = () => {
-    if (note.isEncrypted && note.title === '🔒 Encrypted Note') {
-      return '🔒 Encrypted Note';
-    }
     return note.title || 'Untitled Note';
   };
 
@@ -102,14 +104,14 @@ const NoteCard: React.FC<NoteCardProps> = ({
       >
 
         {/* Status badges - Odoo style */}
-        <div className="absolute top-3 right-12 flex items-center gap-2">
+        <div className="absolute top-4 right-12 flex items-center gap-2">
           {note.isPinned && (
-            <div className="p-1.5 bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded">
+            <div className="p-1 bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded">
               <Pin size={14} className="fill-current" />
             </div>
           )}
           {note.isEncrypted && (
-            <div className="p-1.5 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded">
+            <div className="p-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded">
               <Lock size={14} />
             </div>
           )}
@@ -130,7 +132,7 @@ const NoteCard: React.FC<NoteCardProps> = ({
                   e.stopPropagation();
                   setShowMenu(!showMenu);
                 }}
-                className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
+                className="opacity-100 transition-opacity duration-200 p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
               >
                 <MoreVertical size={16} className="text-gray-500 dark:text-gray-400" />
               </button>
@@ -165,25 +167,27 @@ const NoteCard: React.FC<NoteCardProps> = ({
                     <span className="text-gray-700 dark:text-gray-300">{note.isPinned ? 'Unpin' : 'Pin'}</span>
                   </button>
 
-                  <button
-                    onClick={() => {
-                      onToggleEncrypt();
-                      setShowMenu(false);
-                    }}
-                    className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-left text-sm transition-colors"
-                  >
-                    {note.isEncrypted ? (
-                      <>
-                        <Unlock size={14} className="text-gray-600 dark:text-gray-400" />
-                        <span className="text-gray-700 dark:text-gray-300">Decrypt</span>
-                      </>
-                    ) : (
-                      <>
-                        <Lock size={14} className="text-gray-600 dark:text-gray-400" />
-                        <span className="text-gray-700 dark:text-gray-300">Encrypt</span>
-                      </>
-                    )}
-                  </button>
+                  {(note.isEncrypted || !note.hasBeenEncrypted) && (
+                    <button
+                      onClick={() => {
+                        onToggleEncrypt();
+                        setShowMenu(false);
+                      }}
+                      className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-left text-sm transition-colors"
+                    >
+                      {note.isEncrypted ? (
+                        <>
+                          <Unlock size={14} className="text-gray-600 dark:text-gray-400" />
+                          <span className="text-gray-700 dark:text-gray-300">Decrypt</span>
+                        </>
+                      ) : (
+                        <>
+                          <Lock size={14} className="text-gray-600 dark:text-gray-400" />
+                          <span className="text-gray-700 dark:text-gray-300">Encrypt</span>
+                        </>
+                      )}
+                    </button>
+                  )}
 
                   <button
                     onClick={() => {

@@ -37,6 +37,7 @@ const HomePage: React.FC = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [showLockDialog, setShowLockDialog] = useState(false);
   const [lockPassword, setLockPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [selectedNoteForLock, setSelectedNoteForLock] = useState<Note | null>(null);
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
   const [unlockPassword, setUnlockPassword] = useState('');
@@ -171,15 +172,22 @@ const HomePage: React.FC = () => {
       // Decrypt - use modal
       setSelectedNoteForUnlock(note);
       setShowUnlockDialog(true);
-    } else {
-      // Encrypt - use modal
+    } else if (!note.hasBeenEncrypted) {
+      // Encrypt - use modal (only if never been encrypted)
       setSelectedNoteForLock(note);
       setShowLockDialog(true);
     }
+    // If hasBeenEncrypted is true and isEncrypted is false, do nothing
   };
 
   const handleLockNote = async () => {
     if (!selectedNoteForLock || !lockPassword.trim()) return;
+    
+    // Check password confirmation
+    if (lockPassword !== confirmPassword) {
+      alert('Passwords do not match. Please try again.');
+      return;
+    }
     
     try {
       const lockedNote = await noteService.encryptNote(selectedNoteForLock.id, lockPassword);
@@ -188,6 +196,7 @@ const HomePage: React.FC = () => {
         await loadNotes();
         await loadStats();
         setLockPassword('');
+        setConfirmPassword('');
         setShowLockDialog(false);
         setSelectedNoteForLock(null);
       } else {
@@ -633,6 +642,15 @@ const HomePage: React.FC = () => {
                 className="w-full px-4 py-3 bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-400/50 focus:border-primary-400 transition-all"
               />
               
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleLockNote()}
+                placeholder="Confirm password..."
+                className="w-full px-4 py-3 bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-400/50 focus:border-primary-400 transition-all"
+              />
+              
               <div className="flex gap-3">
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -647,7 +665,7 @@ const HomePage: React.FC = () => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={handleLockNote}
-                  disabled={!lockPassword.trim()}
+                  disabled={!lockPassword.trim() || !confirmPassword.trim() || lockPassword !== confirmPassword}
                   className="flex-1 px-4 py-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Lock Note

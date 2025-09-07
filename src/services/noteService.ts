@@ -18,6 +18,7 @@ class NoteService {
       plainTextContent: this.extractPlainText(content),
       isPinned: false,
       isEncrypted: false,
+      hasBeenEncrypted: false, // New notes have never been encrypted
       tags: [],
       createdAt: now,
       updatedAt: now,
@@ -111,9 +112,10 @@ class NoteService {
     const encryptedNote: Note = {
       ...note,
       isEncrypted: true,
+      hasBeenEncrypted: true, // Mark as having been encrypted
       encryptedData: JSON.stringify({ content: encryptedContent, title: encryptedTitle, salt }),
       content: '', // Clear unencrypted content
-      title: '🔒 Encrypted Note',
+      title: note.title, // Keep the original title
       updatedAt: new Date(),
     };
 
@@ -142,6 +144,7 @@ class NoteService {
       return {
         ...note,
         isEncrypted: false, // Mark as decrypted
+        hasBeenEncrypted: true, // Keep the flag - note has been encrypted before
         content,
         title,
         plainTextContent: this.extractPlainText(content),
@@ -335,6 +338,7 @@ class NoteService {
       recentNotes: notes.slice(0, 5),
     };
   }
+
 }
 
 // Export singleton instance

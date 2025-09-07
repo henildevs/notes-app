@@ -29,6 +29,8 @@ const EditorPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [showAIPanel, setShowAIPanel] = useState(false);
+  const [showNoApiKeyDialog, setShowNoApiKeyDialog] = useState(false);
+  const [apiKey, setApiKey] = useState('');
   const [aiLoading, setAILoading] = useState(false);
   const [aiLoadingFeature, setAILoadingFeature] = useState<string | null>(null);
   const [tagInput, setTagInput] = useState('');
@@ -41,13 +43,9 @@ const EditorPage: React.FC = () => {
   const [unlockError, setUnlockError] = useState('');
   const [showLockDialog, setShowLockDialog] = useState(false);
   const [lockPassword, setLockPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   // Initialize theme and AI service on mount
-  useEffect(() => {
-    loadTheme();
-    checkApiKey();
-  }, []);
-
   const loadTheme = async () => {
     const prefs = await databaseService.getPreferences();
     if (prefs.theme === 'dark' || (prefs.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -61,6 +59,34 @@ const EditorPage: React.FC = () => {
     const prefs = await databaseService.getPreferences();
     if (prefs.groqApiKey) {
       groqAIService.initialize(prefs.groqApiKey);
+    } else {
+      // Show popup to enable AI features
+      setShowNoApiKeyDialog(true);
+    }
+  };
+
+  useEffect(() => {
+    loadTheme();
+    checkApiKey();
+  }, []);
+
+  const handleSaveApiKey = async () => {
+    if (!apiKey.trim()) return;
+    
+    try {
+      await databaseService.savePreferences({
+        theme: 'system',
+        defaultFontSize: 16,
+        autoSaveInterval: 3000,
+        language: 'en',
+        groqApiKey: apiKey.trim(),
+      });
+      
+      groqAIService.initialize(apiKey.trim());
+      setShowNoApiKeyDialog(false);
+      setApiKey('');
+    } catch (error) {
+      console.error('Failed to save API key:', error);
     }
   };
 
@@ -117,6 +143,12 @@ const EditorPage: React.FC = () => {
   const handleLockNote = async () => {
     if (!note || !lockPassword.trim()) return;
     
+    // Check password confirmation
+    if (lockPassword !== confirmPassword) {
+      alert('Passwords do not match. Please try again.');
+      return;
+    }
+    
     try {
       const lockedNote = await noteService.encryptNote(note.id, lockPassword);
       
@@ -125,6 +157,7 @@ const EditorPage: React.FC = () => {
         setPassword('');
         setUnlockError('');
         setLockPassword('');
+        setConfirmPassword('');
         setShowLockDialog(false);
       } else {
         alert('Failed to lock note. Please try again.');
@@ -434,22 +467,7 @@ const EditorPage: React.FC = () => {
               </div>
 
               <div className="flex items-center gap-3">
-                {/* Lock Button - Show for all encrypted notes */}
-                {note.isEncrypted && (
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setShowLockDialog(true)}
-                    className={`p-3 rounded-xl transition-all shadow-lg ${
-                      note.content 
-                        ? 'glass dark:glass-dark hover:bg-red-50 dark:hover:bg-red-900/20' 
-                        : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }`}
-                    title={note.content ? "Lock Note" : "Note is already locked"}
-                  >
-                    <Lock size={18} className={`${note.content ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'}`} />
-                  </motion.button>
-                )}
+                
 
                 {/* Pin Button */}
                 <motion.button
@@ -557,11 +575,14 @@ const EditorPage: React.FC = () => {
                   </div>
                 )}
                 
-                <RichTextEditor
-                  content={note.content}
-                  onChange={handleContentChange}
-                  readOnly={note.isEncrypted && !note.content}
-                />
+                {/* Only show RichTextEditor when note is not encrypted or is decrypted */}
+                {!(note.isEncrypted && !note.content) && (
+                  <RichTextEditor
+                    content={note.content}
+                    onChange={handleContentChange}
+                    readOnly={false}
+                  />
+                )}
               </div>
 
               {/* Glossary Terms Display */}
@@ -903,14 +924,25 @@ const EditorPage: React.FC = () => {
             
             <div className="space-y-4">
               {note.content && (
-                <input
-                  type="password"
-                  value={lockPassword}
-                  onChange={(e) => setLockPassword(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleLockNote()}
-                  placeholder="Enter password to lock..."
-                  className="w-full px-4 py-3 bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-400/50 focus:border-primary-400 transition-all"
-                />
+                <>
+                  <input
+                    type="password"
+                    value={lockPassword}
+                    onChange={(e) => setLockPassword(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleLockNote()}
+                    placeholder="Enter password to lock..."
+                    className="w-full px-4 py-3 bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-400/50 focus:border-primary-400 transition-all"
+                  />
+                  
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleLockNote()}
+                    placeholder="Confirm password..."
+                    className="w-full px-4 py-3 bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-400/50 focus:border-primary-400 transition-all"
+                  />
+                </>
               )}
               
               <div className="flex gap-3">
@@ -927,7 +959,7 @@ const EditorPage: React.FC = () => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={note.content ? handleLockNote : () => setShowLockDialog(false)}
-                  disabled={note.content ? !lockPassword.trim() : false}
+                  disabled={note.content ? (!lockPassword.trim() || !confirmPassword.trim() || lockPassword !== confirmPassword) : false}
                   className={`flex-1 px-4 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 ${
                     note.content 
                       ? 'bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white disabled:opacity-50 disabled:cursor-not-allowed'
@@ -935,6 +967,73 @@ const EditorPage: React.FC = () => {
                   }`}
                 >
                   {note.content ? 'Lock Note' : 'Close'}
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* No API Key Dialog */}
+      {showNoApiKeyDialog && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowNoApiKeyDialog(false)}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="bg-white dark:bg-dark-surface rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 w-full max-w-md mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <Sparkles size={20} className="text-purple-500" />
+              Enable AI Features
+            </h3>
+            
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              To use AI features like summarization, translation, and grammar checking, you need to add your Groq API key.
+            </p>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Groq API Key
+                </label>
+                <input
+                  type="password"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  placeholder="Enter your Groq API key..."
+                  className="w-full px-4 py-3 bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-400/50 focus:border-primary-400 transition-all"
+                />
+              </div>
+              
+              <div className="text-xs text-gray-500 dark:text-gray-400">
+                <p>You can get a free API key from <a href="https://console.groq.com/" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:text-primary-600 underline">Groq Console</a></p>
+              </div>
+              
+              <div className="flex gap-3">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setShowNoApiKeyDialog(false)}
+                  className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200"
+                >
+                  Skip for Now
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleSaveApiKey}
+                  disabled={!apiKey.trim()}
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Enable AI
                 </motion.button>
               </div>
             </div>
