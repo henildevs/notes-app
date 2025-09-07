@@ -6,16 +6,12 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
-  Type,
   Palette,
   Undo,
   Redo,
   List,
   ListOrdered,
-  Quote,
-  Code,
   Link,
-  Image,
 } from 'lucide-react';
 import { RichTextEditorProps } from '../../types';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -30,7 +26,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const [selectedFontSize, setSelectedFontSize] = useState('16');
-  const [showFontSizeDropdown, setShowFontSizeDropdown] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [selectedColor, setSelectedColor] = useState('#000000');
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
@@ -38,7 +33,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [history, setHistory] = useState<string[]>([content]);
   const [historyIndex, setHistoryIndex] = useState(0);
 
-  const fontSizes = ['12', '14', '16', '18', '20', '24', '28', '32', '36', '48'];
   const colors = [
     '#000000', '#374151', '#DC2626', '#EA580C', '#FACC15', 
     '#16A34A', '#0EA5E9', '#2563EB', '#7C3AED', '#DB2777',
@@ -74,7 +68,45 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const handleFormat = useCallback((command: string, value?: string) => {
     if (readOnly) return;
     
-    document.execCommand(command, false, value);
+    // Modern approach for color formatting
+    if (command === 'foreColor' && value) {
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        
+        if (range.toString()) {
+          // Apply color to selected text
+          const span = document.createElement('span');
+          span.style.color = value;
+          span.textContent = range.toString();
+          range.deleteContents();
+          range.insertNode(span);
+          
+          // Move cursor to end of colored text
+          range.setStartAfter(span);
+          range.setEndAfter(span);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        } else {
+          // No text selected - set color for future typing
+          const span = document.createElement('span');
+          span.style.color = value;
+          span.innerHTML = '&nbsp;'; // Non-breaking space to maintain the span
+          
+          range.insertNode(span);
+          
+          // Move cursor inside the span
+          range.setStart(span, 0);
+          range.setEnd(span, 0);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+      }
+    } else {
+      // Fallback to execCommand for other commands
+      document.execCommand(command, false, value);
+    }
+    
     handleContentChange();
     editorRef.current?.focus();
   }, [readOnly, handleContentChange]);
@@ -104,7 +136,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const handleFontSize = (size: string) => {
     handleFormat('fontSize', size);
     setSelectedFontSize(size);
-    setShowFontSizeDropdown(false);
   };
 
   const handleColor = (color: string) => {
@@ -121,12 +152,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   };
 
-  const handleInsertImage = () => {
-    const url = prompt('Enter image URL:');
-    if (url) {
-      handleFormat('insertImage', url);
-    }
-  };
 
   const isFormatActive = (format: string): boolean => {
     return document.queryCommandState(format);
@@ -203,12 +228,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   );
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative overflow-visible ${className}`}>
       {showToolbar && !readOnly && (
         <motion.div 
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="editor-toolbar sticky top-0 z-40"
+          className="editor-toolbar sticky top-0 z-40 overflow-visible"
         >
           {/* Text Formatting */}
           <div className="flex items-center gap-1 border-r border-gray-300 dark:border-gray-600 pr-2 mr-2">
@@ -225,42 +250,59 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           </div>
 
           {/* Font Size */}
-          <div className="relative border-r border-gray-300 dark:border-gray-600 pr-2 mr-2">
+          <div className="flex items-center gap-1 border-r border-gray-300 dark:border-gray-600 pr-2 mr-2">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => setShowFontSizeDropdown(!showFontSizeDropdown)}
-              className="editor-button flex items-center gap-1"
+              onClick={() => {
+                const currentSize = parseInt(selectedFontSize);
+                const newSize = Math.max(8, currentSize - 2);
+                handleFontSize(newSize.toString());
+              }}
+              className="editor-button"
               type="button"
+              title="Decrease font size"
             >
-              <Type size={18} />
-              <span className="text-xs">{selectedFontSize}</span>
+              <span className="text-lg font-bold">−</span>
             </motion.button>
             
-            <AnimatePresence>
-              {showFontSizeDropdown && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="absolute top-full left-0 mt-1 bg-white dark:bg-dark-surface rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50"
-                >
-                  <div className="grid grid-cols-2 gap-1 p-2">
-                    {fontSizes.map(size => (
-                      <button
-                        key={size}
-                        onClick={() => handleFontSize(size)}
-                        className="px-3 py-2 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded text-sm transition-colors"
-                        style={{ fontSize: `${size}px` }}
-                        type="button"
-                      >
-                        {size}
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <input
+              type="number"
+              value={selectedFontSize}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value && parseInt(value) >= 8 && parseInt(value) <= 72) {
+                  handleFontSize(value);
+                }
+              }}
+              onBlur={(e) => {
+                const value = e.target.value;
+                if (!value || parseInt(value) < 8) {
+                  handleFontSize('12');
+                } else if (parseInt(value) > 72) {
+                  handleFontSize('72');
+                }
+              }}
+              className="w-12 px-2 py-1 text-center text-sm bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400/50 focus:border-primary-400"
+              min="8"
+              max="72"
+              title="Font size"
+            />
+            
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                const currentSize = parseInt(selectedFontSize);
+                const newSize = Math.min(72, currentSize + 2);
+                handleFontSize(newSize.toString());
+              }}
+              className="editor-button"
+              type="button"
+              title="Increase font size"
+            >
+              <span className="text-lg font-bold">+</span>
+            </motion.button>
           </div>
 
           {/* Color Picker */}
@@ -285,14 +327,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="absolute top-full left-0 mt-1 bg-white dark:bg-dark-surface rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 p-3 z-50"
+                  className="absolute top-full left-0 mt-2 bg-white dark:bg-dark-surface rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 p-2 z-[200]"
                 >
-                  <div className="grid grid-cols-5 gap-2">
+                  <div className="flex gap-1 p-1 overflow-x-auto max-w-48 color-palette-scrollbar">
                     {colors.map(color => (
                       <button
                         key={color}
                         onClick={() => handleColor(color)}
-                        className="w-8 h-8 rounded-lg border-2 border-gray-300 hover:border-primary-500 transition-colors"
+                        className="w-6 h-6 rounded border border-gray-300 hover:border-primary-500 transition-colors flex-shrink-0"
                         style={{ backgroundColor: color }}
                         type="button"
                       />
@@ -303,12 +345,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             </AnimatePresence>
           </div>
 
-          {/* Lists and Quotes */}
+          {/* Lists */}
           <div className="flex items-center gap-1 border-r border-gray-300 dark:border-gray-600 pr-2 mr-2">
             <ToolbarButton icon={List} command="insertUnorderedList" tooltip="Bullet List" />
             <ToolbarButton icon={ListOrdered} command="insertOrderedList" tooltip="Numbered List" />
-            <ToolbarButton icon={Quote} command="formatBlock" tooltip="Quote" />
-            <ToolbarButton icon={Code} command="formatBlock" tooltip="Code Block" />
           </div>
 
           {/* Insert Elements */}
@@ -317,11 +357,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               icon={Link} 
               onClick={() => setIsLinkDialogOpen(true)} 
               tooltip="Insert Link" 
-            />
-            <ToolbarButton 
-              icon={Image} 
-              onClick={handleInsertImage} 
-              tooltip="Insert Image" 
             />
           </div>
 

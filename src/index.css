@@ -88,6 +88,19 @@
     @apply bg-gradient-to-b from-primary-400 to-primary-600 rounded-full;
   }
   
+  /* Thin scrollbar for color palette */
+  .color-palette-scrollbar::-webkit-scrollbar {
+    @apply h-1;
+  }
+  
+  .color-palette-scrollbar::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-dark-surface rounded-full;
+  }
+  
+  .color-palette-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gradient-to-r from-primary-400 to-primary-600 rounded-full;
+  }
+  
   /* Rich text editor styles */
   .editor-toolbar {
     @apply flex items-center gap-1 p-3 border-b border-gray-200 dark:border-gray-700;

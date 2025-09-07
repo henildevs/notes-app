@@ -13,10 +13,6 @@ import {
   AlertCircle,
   X,
   BookOpen,
-  Wand2,
-  Hash,
-  FileText,
-  Zap,
   Languages,
 } from 'lucide-react';
 import RichTextEditor from '../components/Editor/RichTextEditor';
@@ -40,6 +36,11 @@ const EditorPage: React.FC = () => {
   const [showGlossaryTerms, setShowGlossaryTerms] = useState(false);
   const [showGrammarErrors, setShowGrammarErrors] = useState(false);
   const [showTranslationPanel, setShowTranslationPanel] = useState(false);
+  const [password, setPassword] = useState('');
+  const [isUnlocking, setIsUnlocking] = useState(false);
+  const [unlockError, setUnlockError] = useState('');
+  const [showLockDialog, setShowLockDialog] = useState(false);
+  const [lockPassword, setLockPassword] = useState('');
 
   // Initialize theme and AI service on mount
   useEffect(() => {
@@ -112,6 +113,46 @@ const EditorPage: React.FC = () => {
       createNewNote();
     }
   }, [id, loadNote, createNewNote]);
+
+  const handleLockNote = async () => {
+    if (!note || !lockPassword.trim()) return;
+    
+    try {
+      const lockedNote = await noteService.encryptNote(note.id, lockPassword);
+      if (lockedNote) {
+        setNote(lockedNote);
+        setPassword('');
+        setUnlockError('');
+        setLockPassword('');
+        setShowLockDialog(false);
+      }
+    } catch (error) {
+      console.error('Failed to lock note:', error);
+      alert('Failed to lock note. Please try again.');
+    }
+  };
+
+  const handleUnlockNote = async () => {
+    if (!note || !password.trim()) return;
+    
+    setIsUnlocking(true);
+    setUnlockError('');
+    
+    try {
+      const decryptedNote = await noteService.decryptNote(note.id, password);
+      if (decryptedNote) {
+        setNote(decryptedNote);
+        setPassword('');
+      } else {
+        setUnlockError('Invalid password. Please try again.');
+      }
+    } catch (error) {
+      console.error('Failed to unlock note:', error);
+      setUnlockError('Failed to unlock note. Please check your password.');
+    } finally {
+      setIsUnlocking(false);
+    }
+  };
 
   const handleContentChange = useCallback((content: string, plainText: string) => {
     if (!note) return;
@@ -390,20 +431,16 @@ const EditorPage: React.FC = () => {
               </div>
 
               <div className="flex items-center gap-3">
-                {/* AI Features Button */}
-                {groqAIService.isReady() && (
+                {/* Lock/Unlock Button */}
+                {note.isEncrypted && note.content && (
                   <motion.button
-                    whileHover={{ scale: 1.05, rotate: 5 }}
+                    whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => setShowAIPanel(!showAIPanel)}
-                    className={`p-3 rounded-xl transition-all shadow-lg ${
-                      showAIPanel
-                        ? 'bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-purple-500/30'
-                        : 'glass dark:glass-dark hover:bg-purple-50 dark:hover:bg-purple-900/20'
-                    }`}
-                    title="AI Features"
+                    onClick={() => setShowLockDialog(true)}
+                    className="p-3 rounded-xl transition-all shadow-lg glass dark:glass-dark hover:bg-red-50 dark:hover:bg-red-900/20"
+                    title="Lock Note"
                   >
-                    <Sparkles size={18} className={showAIPanel ? 'animate-pulse' : ''} />
+                    <Lock size={18} className="text-red-600 dark:text-red-400" />
                   </motion.button>
                 )}
 
@@ -428,7 +465,7 @@ const EditorPage: React.FC = () => {
                   whileTap={{ scale: 0.95 }}
                   onClick={handleSave}
                   disabled={isSaving}
-                  className="btn-premium flex items-center gap-2 text-white disabled:opacity-50"
+                  className="px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSaving ? (
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -460,6 +497,59 @@ const EditorPage: React.FC = () => {
               transition={{ delay: 0.2 }}
             >
               <div className="glass dark:glass-dark rounded-2xl shadow-xl border border-white/20 dark:border-white/10 overflow-hidden">
+                {/* Encrypted Note Unlock Interface */}
+                {note.isEncrypted && !note.content && (
+                  <div className="p-8 text-center">
+                    <div className="mb-6">
+                      <Lock size={48} className="mx-auto text-gray-400 dark:text-gray-500 mb-4" />
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                        Note is Encrypted
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        Enter the password to unlock this note
+                      </p>
+                    </div>
+                    
+                    <div className="max-w-md mx-auto space-y-4">
+                      <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleUnlockNote()}
+                        placeholder="Enter password..."
+                        className="w-full px-4 py-3 bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-400/50 focus:border-primary-400 transition-all"
+                        disabled={isUnlocking}
+                      />
+                      
+                      {unlockError && (
+                        <div className="text-red-500 text-sm bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+                          {unlockError}
+                        </div>
+                      )}
+                      
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={handleUnlockNote}
+                        disabled={!password.trim() || isUnlocking}
+                        className="w-full px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isUnlocking ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            <span>Unlocking...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Lock size={16} />
+                            <span>Unlock Note</span>
+                          </>
+                        )}
+                      </motion.button>
+                    </div>
+                  </div>
+                )}
+                
                 <RichTextEditor
                   content={note.content}
                   onChange={handleContentChange}
@@ -593,7 +683,7 @@ const EditorPage: React.FC = () => {
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
                     placeholder="Add a new tag..."
-                    className="flex-1 px-4 py-2 glass dark:glass-dark border border-white/20 dark:border-white/10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/50 focus:border-primary-400 transition-all"
+                    className="flex-1 px-4 py-2 bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-400/50 focus:border-primary-400 transition-all"
                   />
                   <motion.button
                     whileHover={{ scale: 1.05 }}
@@ -605,114 +695,6 @@ const EditorPage: React.FC = () => {
                   </motion.button>
                 </div>
               </motion.div>
-
-              {/* AI Panel */}
-              {showAIPanel && groqAIService.isReady() && (
-                <motion.div
-                  initial={{ opacity: 0, x: 20, scale: 0.95 }}
-                  animate={{ opacity: 1, x: 0, scale: 1 }}
-                  transition={{ delay: 0.4, type: "spring" }}
-                  className="glass dark:glass-dark rounded-2xl shadow-xl border border-white/20 dark:border-white/10 p-6 bg-gradient-to-br from-purple-50/50 to-cyan-50/50 dark:from-purple-900/10 dark:to-cyan-900/10"
-                >
-                  <h3 className="font-bold text-lg mb-4 flex items-center gap-2 gradient-text">
-                    <Brain size={20} className="text-purple-500" />
-                    AI Assistant
-                  </h3>
-
-                  {/* AI Summary */}
-                  {note.aiMetadata?.summary && (
-                    <motion.div 
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      className="mb-4 p-4 bg-gradient-to-r from-purple-50 to-cyan-50 dark:from-purple-900/20 dark:to-cyan-900/20 rounded-xl border border-purple-200/50 dark:border-purple-700/30"
-                    >
-                      <p className="text-sm text-purple-700 dark:text-purple-300 leading-relaxed">
-                        ✨ {note.aiMetadata.summary}
-                      </p>
-                    </motion.div>
-                  )}
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={handleGenerateSummary}
-                      disabled={aiLoading}
-                      className="px-4 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl hover:from-purple-600 hover:to-indigo-600 disabled:opacity-50 transition-all text-sm font-semibold shadow-lg flex items-center justify-center gap-2"
-                    >
-                      {aiLoading && aiLoadingFeature === 'summary' ? (
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <FileText size={16} />
-                      )}
-                      <span>Summary</span>
-                    </motion.button>
-
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={handleGenerateTags}
-                      disabled={aiLoading}
-                      className="px-4 py-3 bg-gradient-to-r from-purple-500 to-cyan-500 text-white rounded-xl hover:from-purple-600 hover:to-cyan-600 disabled:opacity-50 transition-all text-sm font-semibold shadow-lg flex items-center justify-center gap-2"
-                    >
-                      {aiLoading && aiLoadingFeature === 'tags' ? (
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <Hash size={16} />
-                      )}
-                      <span>Tags</span>
-                    </motion.button>
-
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={handleFindGlossaryTerms}
-                      disabled={aiLoading}
-                      className="px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:from-green-600 hover:to-emerald-600 disabled:opacity-50 transition-all text-sm font-semibold shadow-lg flex items-center justify-center gap-2"
-                    >
-                      {aiLoading && aiLoadingFeature === 'glossary' ? (
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <BookOpen size={16} />
-                      )}
-                      <span>Glossary</span>
-                    </motion.button>
-
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={handleCheckGrammar}
-                      disabled={aiLoading}
-                      className="px-4 py-3 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-xl hover:from-red-600 hover:to-orange-600 disabled:opacity-50 transition-all text-sm font-semibold shadow-lg flex items-center justify-center gap-2"
-                    >
-                      {aiLoading && aiLoadingFeature === 'grammar' ? (
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <Wand2 size={16} />
-                      )}
-                      <span>Grammar</span>
-                    </motion.button>
-                  </div>
-
-                  {/* Translation Button */}
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setShowTranslationPanel(true)}
-                    className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all text-sm font-semibold shadow-lg flex items-center justify-center gap-2 mt-3"
-                  >
-                    <Languages size={16} />
-                    <span>Translate</span>
-                  </motion.button>
-
-                  <div className="mt-4 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-xl">
-                    <p className="text-xs text-yellow-700 dark:text-yellow-300 flex items-center gap-2">
-                      <Zap size={14} />
-                      AI features powered by Groq
-                    </p>
-                  </div>
-                </motion.div>
-              )}
 
               {/* Note Info */}
               <motion.div
@@ -761,6 +743,187 @@ const EditorPage: React.FC = () => {
           originalContent={note.content}
           onClose={() => setShowTranslationPanel(false)}
         />
+      )}
+
+      {/* Fixed AI Assistant Button */}
+      {groqAIService.isReady() && (
+        <motion.button
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          whileHover={{ scale: 1.1, rotate: 5 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setShowAIPanel(!showAIPanel)}
+          className={`fixed bottom-6 right-6 z-50 p-4 rounded-full transition-all shadow-xl ${
+            showAIPanel
+              ? 'bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-purple-500/30'
+              : 'glass dark:glass-dark hover:bg-purple-50 dark:hover:bg-purple-900/20'
+          }`}
+          title="AI Assistant"
+        >
+          <Sparkles size={24} className={showAIPanel ? 'animate-pulse' : ''} />
+        </motion.button>
+      )}
+
+      {/* Fixed AI Panel */}
+      {showAIPanel && groqAIService.isReady() && note && (
+        <motion.div
+          initial={{ opacity: 0, x: 20, scale: 0.95 }}
+          animate={{ opacity: 1, x: 0, scale: 1 }}
+          exit={{ opacity: 0, x: 20, scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 300 }}
+          className="fixed bottom-20 right-6 z-40 w-80 max-h-96 overflow-y-auto bg-white dark:bg-dark-surface rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6"
+        >
+          <h3 className="font-bold text-lg mb-4 flex items-center gap-2 gradient-text">
+            <Brain size={20} className="text-purple-500" />
+            AI Assistant
+          </h3>
+
+          {/* AI Summary */}
+          {note.aiMetadata?.summary && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className="mb-4 p-4 bg-gradient-to-r from-purple-50 to-cyan-50 dark:from-purple-900/20 dark:to-cyan-900/20 rounded-xl border border-purple-200/50 dark:border-purple-700/30"
+            >
+              <p className="text-sm text-purple-700 dark:text-purple-300 leading-relaxed">
+                ✨ {note.aiMetadata.summary}
+              </p>
+            </motion.div>
+          )}
+
+          {/* AI Actions */}
+          <div className="space-y-3">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleGenerateSummary}
+              disabled={aiLoading}
+              className="w-full px-4 py-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {aiLoading && aiLoadingFeature === 'summary' ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Sparkles size={16} />
+              )}
+              <span>{aiLoading && aiLoadingFeature === 'summary' ? 'Generating...' : 'Generate Summary'}</span>
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleGenerateTags}
+              disabled={aiLoading}
+              className="w-full px-4 py-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {aiLoading && aiLoadingFeature === 'tags' ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Tag size={16} />
+              )}
+              <span>{aiLoading && aiLoadingFeature === 'tags' ? 'Generating...' : 'Suggest Tags'}</span>
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleFindGlossaryTerms}
+              disabled={aiLoading}
+              className="w-full px-4 py-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {aiLoading && aiLoadingFeature === 'glossary' ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <BookOpen size={16} />
+              )}
+              <span>{aiLoading && aiLoadingFeature === 'glossary' ? 'Finding...' : 'Find Glossary Terms'}</span>
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleCheckGrammar}
+              disabled={aiLoading}
+              className="w-full px-4 py-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {aiLoading && aiLoadingFeature === 'grammar' ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <CheckCircle size={16} />
+              )}
+              <span>{aiLoading && aiLoadingFeature === 'grammar' ? 'Checking...' : 'Check Grammar'}</span>
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setShowTranslationPanel(true)}
+              className="w-full px-4 py-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 mt-3"
+            >
+              <Languages size={16} />
+              <span>Translate</span>
+            </motion.button>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Lock Password Dialog */}
+      {showLockDialog && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          onClick={() => setShowLockDialog(false)}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="bg-white dark:bg-dark-surface rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 w-full max-w-md mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <Lock size={20} className="text-red-500" />
+              Lock Note
+            </h3>
+            
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              Enter a password to encrypt this note. You'll need this password to unlock it later.
+            </p>
+            
+            <div className="space-y-4">
+              <input
+                type="password"
+                value={lockPassword}
+                onChange={(e) => setLockPassword(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleLockNote()}
+                placeholder="Enter password to lock..."
+                className="w-full px-4 py-3 bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-400/50 focus:border-primary-400 transition-all"
+              />
+              
+              <div className="flex gap-3">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setShowLockDialog(false)}
+                  className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
+                >
+                  Cancel
+                </motion.button>
+                
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleLockNote}
+                  disabled={!lockPassword.trim()}
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Lock Note
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
       )}
     </div>
   );

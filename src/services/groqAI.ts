@@ -113,7 +113,7 @@ class GroqAIService {
           {
             role: 'system',
             content: `You are a helpful assistant that identifies key technical terms, concepts, or jargon in text that might need explanation. 
-            Return a JSON array of objects with this structure: [{"term": "term", "definition": "brief definition"}]. 
+            Return a JSON object with this exact structure: {"terms": [{"term": "term", "definition": "brief definition"}]}. 
             Find up to 5 most important terms. Only include terms that are actually present in the text.`
           },
           {
@@ -177,8 +177,7 @@ class GroqAIService {
         messages: [
           {
             role: 'system',
-            content: `You are a grammar and spelling checker. Analyze the text and return a JSON array of errors.
-            Each error should have: {"text": "incorrect text", "suggestion": "corrected text", "type": "spelling|grammar|punctuation"}.
+            content: `You are a grammar and spelling checker. Analyze the text and return a JSON object with this exact structure: {"errors": [{"text": "incorrect text", "suggestion": "corrected text", "type": "spelling|grammar|punctuation"}]}.
             Only include actual errors, not style suggestions. Return maximum 10 most important errors.`
           },
           {
