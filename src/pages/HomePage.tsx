@@ -14,7 +14,8 @@ import {
   Tag,
   Moon,
   Sun,
-  Key
+  Key,
+  Lock
 } from 'lucide-react';
 import NoteCard from '../components/Notes/NoteCard';
 import { Note } from '../types';
@@ -34,6 +35,14 @@ const HomePage: React.FC = () => {
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
   const [apiKey, setApiKey] = useState('');
   const [darkMode, setDarkMode] = useState(false);
+  const [showLockDialog, setShowLockDialog] = useState(false);
+  const [lockPassword, setLockPassword] = useState('');
+  const [selectedNoteForLock, setSelectedNoteForLock] = useState<Note | null>(null);
+  const [showUnlockDialog, setShowUnlockDialog] = useState(false);
+  const [unlockPassword, setUnlockPassword] = useState('');
+  const [selectedNoteForUnlock, setSelectedNoteForUnlock] = useState<Note | null>(null);
+  const [isUnlocking, setIsUnlocking] = useState(false);
+  const [unlockError, setUnlockError] = useState('');
   const [stats, setStats] = useState({
     totalNotes: 0,
     pinnedNotes: 0,
@@ -159,32 +168,65 @@ const HomePage: React.FC = () => {
     if (!note) return;
 
     if (note.isEncrypted) {
-      // Decrypt
-      const password = prompt('Enter password to decrypt:');
-      if (password) {
-        try {
-          await noteService.decryptNote(id, password);
-          await loadNotes();
-        } catch (error) {
-          alert('Invalid password!');
-        }
-      }
+      // Decrypt - use modal
+      setSelectedNoteForUnlock(note);
+      setShowUnlockDialog(true);
     } else {
-      // Encrypt
-      const password = prompt('Enter a password to encrypt this note:');
-      if (password) {
-        const confirmPassword = prompt('Confirm password:');
-        if (password === confirmPassword) {
-          try {
-            await noteService.encryptNote(id, password);
-            await loadNotes();
-          } catch (error) {
-            console.error('Failed to encrypt note:', error);
-          }
-        } else {
-          alert('Passwords do not match!');
-        }
+      // Encrypt - use modal
+      setSelectedNoteForLock(note);
+      setShowLockDialog(true);
+    }
+  };
+
+  const handleLockNote = async () => {
+    if (!selectedNoteForLock || !lockPassword.trim()) return;
+    
+    try {
+      const lockedNote = await noteService.encryptNote(selectedNoteForLock.id, lockPassword);
+      
+      if (lockedNote) {
+        await loadNotes();
+        await loadStats();
+        setLockPassword('');
+        setShowLockDialog(false);
+        setSelectedNoteForLock(null);
+      } else {
+        alert('Failed to lock note. Please try again.');
       }
+    } catch (error) {
+      console.error('Failed to lock note:', error);
+      alert('Failed to lock note. Please try again.');
+    }
+  };
+
+  const handleUnlockNote = async () => {
+    if (!selectedNoteForUnlock || !unlockPassword.trim()) return;
+    
+    setIsUnlocking(true);
+    setUnlockError('');
+    
+    try {
+      const decryptedNote = await noteService.decryptNote(selectedNoteForUnlock.id, unlockPassword);
+      
+      if (decryptedNote) {
+        // Update the notes list with the decrypted note
+        setNotes(prevNotes => 
+          prevNotes.map(note => 
+            note.id === selectedNoteForUnlock.id ? decryptedNote : note
+          )
+        );
+        await loadStats();
+        setUnlockPassword('');
+        setShowUnlockDialog(false);
+        setSelectedNoteForUnlock(null);
+      } else {
+        setUnlockError('Invalid password. Please try again.');
+      }
+    } catch (error) {
+      console.error('Failed to unlock note:', error);
+      setUnlockError('Failed to unlock note. Please check your password.');
+    } finally {
+      setIsUnlocking(false);
     }
   };
 
@@ -555,6 +597,144 @@ const HomePage: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Lock Password Dialog */}
+      {showLockDialog && selectedNoteForLock && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          onClick={() => setShowLockDialog(false)}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="bg-white dark:bg-dark-surface rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 w-full max-w-md mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <Lock size={20} className="text-gray-600 dark:text-gray-400" />
+              Lock Note
+            </h3>
+            
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              Enter a password to encrypt "{selectedNoteForLock.title}". You'll need this password to unlock it later.
+            </p>
+            
+            <div className="space-y-4">
+              <input
+                type="password"
+                value={lockPassword}
+                onChange={(e) => setLockPassword(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleLockNote()}
+                placeholder="Enter password to lock..."
+                className="w-full px-4 py-3 bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-400/50 focus:border-primary-400 transition-all"
+              />
+              
+              <div className="flex gap-3">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setShowLockDialog(false)}
+                  className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
+                >
+                  Cancel
+                </motion.button>
+                
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleLockNote}
+                  disabled={!lockPassword.trim()}
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Lock Note
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* Unlock Password Dialog */}
+      {showUnlockDialog && selectedNoteForUnlock && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          onClick={() => setShowUnlockDialog(false)}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="bg-white dark:bg-dark-surface rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 w-full max-w-md mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <Lock size={20} className="text-gray-600 dark:text-gray-400" />
+              Unlock Note
+            </h3>
+            
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              Enter the password to unlock "{selectedNoteForUnlock.title}".
+            </p>
+            
+            <div className="space-y-4">
+              <input
+                type="password"
+                value={unlockPassword}
+                onChange={(e) => setUnlockPassword(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleUnlockNote()}
+                placeholder="Enter password..."
+                className="w-full px-4 py-3 bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-400/50 focus:border-primary-400 transition-all"
+                disabled={isUnlocking}
+              />
+              
+              {unlockError && (
+                <div className="text-red-500 text-sm bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+                  {unlockError}
+                </div>
+              )}
+              
+              <div className="flex gap-3">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setShowUnlockDialog(false)}
+                  className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
+                  disabled={isUnlocking}
+                >
+                  Cancel
+                </motion.button>
+                
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleUnlockNote}
+                  disabled={!unlockPassword.trim() || isUnlocking}
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isUnlocking ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Unlocking...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Lock size={16} />
+                      <span>Unlock Note</span>
+                    </>
+                  )}
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 };

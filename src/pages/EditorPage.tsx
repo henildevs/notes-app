@@ -119,12 +119,15 @@ const EditorPage: React.FC = () => {
     
     try {
       const lockedNote = await noteService.encryptNote(note.id, lockPassword);
+      
       if (lockedNote) {
         setNote(lockedNote);
         setPassword('');
         setUnlockError('');
         setLockPassword('');
         setShowLockDialog(false);
+      } else {
+        alert('Failed to lock note. Please try again.');
       }
     } catch (error) {
       console.error('Failed to lock note:', error);
@@ -431,16 +434,20 @@ const EditorPage: React.FC = () => {
               </div>
 
               <div className="flex items-center gap-3">
-                {/* Lock/Unlock Button */}
-                {note.isEncrypted && note.content && (
+                {/* Lock Button - Show for all encrypted notes */}
+                {note.isEncrypted && (
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setShowLockDialog(true)}
-                    className="p-3 rounded-xl transition-all shadow-lg glass dark:glass-dark hover:bg-red-50 dark:hover:bg-red-900/20"
-                    title="Lock Note"
+                    className={`p-3 rounded-xl transition-all shadow-lg ${
+                      note.content 
+                        ? 'glass dark:glass-dark hover:bg-red-50 dark:hover:bg-red-900/20' 
+                        : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    }`}
+                    title={note.content ? "Lock Note" : "Note is already locked"}
                   >
-                    <Lock size={18} className="text-red-600 dark:text-red-400" />
+                    <Lock size={18} className={`${note.content ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'}`} />
                   </motion.button>
                 )}
 
@@ -883,23 +890,28 @@ const EditorPage: React.FC = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <Lock size={20} className="text-red-500" />
-              Lock Note
+              <Lock size={20} className="text-gray-600 dark:text-gray-400" />
+              {note.content ? 'Lock Note' : 'Note Already Locked'}
             </h3>
             
             <p className="text-gray-600 dark:text-gray-400 mb-6">
-              Enter a password to encrypt this note. You'll need this password to unlock it later.
+              {note.content 
+                ? "Enter a password to encrypt this note. You'll need this password to unlock it later."
+                : "This note is already encrypted. You can unlock it by entering the correct password."
+              }
             </p>
             
             <div className="space-y-4">
-              <input
-                type="password"
-                value={lockPassword}
-                onChange={(e) => setLockPassword(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleLockNote()}
-                placeholder="Enter password to lock..."
-                className="w-full px-4 py-3 bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-400/50 focus:border-primary-400 transition-all"
-              />
+              {note.content && (
+                <input
+                  type="password"
+                  value={lockPassword}
+                  onChange={(e) => setLockPassword(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleLockNote()}
+                  placeholder="Enter password to lock..."
+                  className="w-full px-4 py-3 bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-400/50 focus:border-primary-400 transition-all"
+                />
+              )}
               
               <div className="flex gap-3">
                 <motion.button
@@ -914,11 +926,15 @@ const EditorPage: React.FC = () => {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={handleLockNote}
-                  disabled={!lockPassword.trim()}
-                  className="flex-1 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={note.content ? handleLockNote : () => setShowLockDialog(false)}
+                  disabled={note.content ? !lockPassword.trim() : false}
+                  className={`flex-1 px-4 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 ${
+                    note.content 
+                      ? 'bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white disabled:opacity-50 disabled:cursor-not-allowed'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  }`}
                 >
-                  Lock Note
+                  {note.content ? 'Lock Note' : 'Close'}
                 </motion.button>
               </div>
             </div>

@@ -100,7 +100,7 @@ class NoteService {
   // Encrypt a note
   async encryptNote(id: string, password: string): Promise<Note | null> {
     const note = await databaseService.getNote(id);
-    if (!note || note.isEncrypted) return null;
+    if (!note) return null;
 
     const { encryptedContent, encryptedTitle, salt } = encryptionService.encryptNote(
       note.content,
@@ -141,6 +141,7 @@ class NoteService {
       // Return decrypted note (not saved to DB)
       return {
         ...note,
+        isEncrypted: false, // Mark as decrypted
         content,
         title,
         plainTextContent: this.extractPlainText(content),

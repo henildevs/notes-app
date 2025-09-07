@@ -102,7 +102,7 @@ const NoteCard: React.FC<NoteCardProps> = ({
       >
 
         {/* Status badges - Odoo style */}
-        <div className="absolute top-3 right-3 flex items-center gap-2">
+        <div className="absolute top-3 right-12 flex items-center gap-2">
           {note.isPinned && (
             <div className="p-1.5 bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded">
               <Pin size={14} className="fill-current" />
@@ -119,12 +119,12 @@ const NoteCard: React.FC<NoteCardProps> = ({
         <div className="p-4">
           {/* Header */}
           <div className="flex items-start justify-between mb-2">
-            <h3 className="font-semibold text-gray-900 dark:text-white text-base line-clamp-1 flex-1 pr-12">
+            <h3 className="font-semibold text-gray-900 dark:text-white text-base line-clamp-1 flex-1 pr-20">
               {getDisplayTitle()}
             </h3>
             
             {/* Menu Button - Odoo style */}
-            <div className="relative">
+            <div className="relative ml-2">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
