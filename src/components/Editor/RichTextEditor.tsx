@@ -46,22 +46,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     '#38BDF8', '#60A5FA', '#A78BFA', '#F472B6', '#FFFFFF',
   ];
 
-  useEffect(() => {
-    if (!editorRef.current) return;
-    
-    if (content !== editorRef.current.innerHTML) {
-      editorRef.current.innerHTML = content;
-    }
-  }, [content]);
-
-  const handleFormat = useCallback((command: string, value?: string) => {
-    if (readOnly) return;
-    
-    document.execCommand(command, false, value);
-    handleContentChange();
-    editorRef.current?.focus();
-  }, [readOnly]);
-
   const handleContentChange = useCallback(() => {
     if (!editorRef.current) return;
     
@@ -79,6 +63,22 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     onChange(htmlContent, plainText);
   }, [onChange, history, historyIndex]);
 
+  useEffect(() => {
+    if (!editorRef.current) return;
+    
+    if (content !== editorRef.current.innerHTML) {
+      editorRef.current.innerHTML = content;
+    }
+  }, [content]);
+
+  const handleFormat = useCallback((command: string, value?: string) => {
+    if (readOnly) return;
+    
+    document.execCommand(command, false, value);
+    handleContentChange();
+    editorRef.current?.focus();
+  }, [readOnly, handleContentChange]);
+
   const handleUndo = useCallback(() => {
     if (historyIndex > 0) {
       const newIndex = historyIndex - 1;
@@ -88,7 +88,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         handleContentChange();
       }
     }
-  }, [historyIndex, history]);
+  }, [historyIndex, history, handleContentChange]);
 
   const handleRedo = useCallback(() => {
     if (historyIndex < history.length - 1) {
@@ -99,7 +99,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         handleContentChange();
       }
     }
-  }, [historyIndex, history]);
+  }, [historyIndex, history, handleContentChange]);
 
   const handleFontSize = (size: string) => {
     handleFormat('fontSize', size);

@@ -243,7 +243,7 @@ class GroqAIService {
         messages: [
           {
             role: 'system',
-            content: `You are a professional translator. Translate the text accurately to ${targetLanguage}. Maintain the original formatting and tone.`
+            content: `You are a professional translator. Translate the text accurately to ${targetLanguage}. Maintain the original formatting, HTML tags, and structure. Preserve any markdown formatting, links, and styling. Only translate the text content, not the HTML structure.`
           },
           {
             role: 'user',
@@ -260,6 +260,32 @@ class GroqAIService {
       console.error('Failed to translate text:', error);
       throw error;
     }
+  }
+
+  /**
+   * Get supported languages for translation
+   */
+  getSupportedLanguages(): Array<{code: string, name: string, nativeName: string}> {
+    return [
+      { code: 'en', name: 'English', nativeName: 'English' },
+      { code: 'es', name: 'Spanish', nativeName: 'Español' },
+      { code: 'fr', name: 'French', nativeName: 'Français' },
+      { code: 'de', name: 'German', nativeName: 'Deutsch' },
+      { code: 'it', name: 'Italian', nativeName: 'Italiano' },
+      { code: 'ja', name: 'Japanese', nativeName: '日本語' },
+      { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी' },
+      { code: 'bn', name: 'Bengali', nativeName: 'বাংলা' },
+      { code: 'te', name: 'Telugu', nativeName: 'తెలుగు' },
+      { code: 'mr', name: 'Marathi', nativeName: 'मराठी' },
+      { code: 'ta', name: 'Tamil', nativeName: 'தமிழ்' },
+      { code: 'gu', name: 'Gujarati', nativeName: 'ગુજરાતી' },
+      { code: 'kn', name: 'Kannada', nativeName: 'ಕನ್ನಡ' },
+      { code: 'ml', name: 'Malayalam', nativeName: 'മലയാളം' },
+      { code: 'pa', name: 'Punjabi', nativeName: 'ਪੰਜਾਬੀ' },
+      { code: 'or', name: 'Odia', nativeName: 'ଓଡ଼ିଆ' },
+      { code: 'as', name: 'Assamese', nativeName: 'অসমীয়া' },
+      { code: 'ur', name: 'Urdu', nativeName: 'اردو' },
+    ];
   }
   
   /**

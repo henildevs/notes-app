@@ -149,7 +149,7 @@ class EncryptionService {
     }
     
     // Check for special characters
-    if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    if (/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
       score += 1;
     } else {
       feedback.push('Include special characters');

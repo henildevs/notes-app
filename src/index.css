@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -14,47 +14,55 @@
   }
   
   body {
-    @apply bg-gray-50 dark:bg-dark-bg text-gray-900 dark:text-dark-text;
-    @apply transition-colors duration-300;
+    @apply bg-white dark:bg-dark-bg text-gray-800 dark:text-dark-text;
+    @apply transition-colors duration-200;
   }
 }
 
 @layer components {
-  /* Glass morphism effect */
-  .glass {
-    @apply bg-white/70 backdrop-blur-xl border border-white/20;
+  /* Odoo-style card effect */
+  .odoo-card {
+    @apply bg-white rounded-lg shadow-sm border border-gray-100;
+    @apply hover:shadow-md transition-shadow duration-200;
   }
   
-  .glass-dark {
-    @apply bg-dark-surface/70 backdrop-blur-xl border border-white/10;
+  .odoo-card-dark {
+    @apply bg-dark-surface rounded-lg shadow-sm border border-gray-800;
+    @apply hover:shadow-md transition-shadow duration-200;
   }
   
-  /* Premium button styles */
-  .btn-premium {
-    @apply px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600;
-    @apply rounded-xl font-semibold shadow-lg;
-    @apply hover:from-primary-600 hover:to-primary-700;
-    @apply transform hover:scale-105 transition-all duration-200;
-    @apply hover:shadow-xl hover:shadow-primary-500/25;
-    @apply active:scale-95;
+  /* Odoo-style button */
+  .btn-odoo {
+    @apply px-5 py-2.5 bg-primary-500 text-white;
+    @apply rounded-md font-medium;
+    @apply hover:bg-primary-600 transition-colors duration-200;
+    @apply active:bg-primary-700;
   }
   
-  /* Gradient text */
-  .gradient-text {
-    @apply bg-gradient-to-r from-primary-600 to-secondary;
-    @apply bg-clip-text text-transparent;
+  .btn-odoo-secondary {
+    @apply px-5 py-2.5 bg-white text-gray-700 border border-gray-300;
+    @apply rounded-md font-medium;
+    @apply hover:bg-gray-50 transition-colors duration-200;
+    @apply active:bg-gray-100;
   }
   
-  .gradient-text-premium {
-    @apply bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600;
-    @apply bg-clip-text text-transparent animate-gradient;
-    background-size: 200% auto;
+  /* Odoo-style text */
+  .text-odoo-primary {
+    @apply text-primary-500;
   }
   
-  /* Card hover effects */
-  .card-hover {
-    @apply transition-all duration-300;
-    @apply hover:translate-y-[-4px] hover:shadow-2xl;
+  .text-odoo-secondary {
+    @apply text-secondary-400;
+  }
+  
+  .heading-odoo {
+    @apply text-gray-900 dark:text-gray-100 font-bold;
+  }
+  
+  /* Odoo card hover effects */
+  .odoo-hover {
+    @apply transition-all duration-200;
+    @apply hover:shadow-lg hover:border-primary-200;
   }
   
   /* Neon glow effect */

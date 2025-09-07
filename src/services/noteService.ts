@@ -240,6 +240,40 @@ class NoteService {
     }
   }
 
+  // Translate note content
+  async translateNote(id: string, targetLanguage: string): Promise<string | null> {
+    const note = await databaseService.getNote(id);
+    if (!note || !note.content) return null;
+
+    try {
+      const translatedContent = await groqAIService.translateText(note.content, targetLanguage);
+      
+      // Store translation in AI metadata
+      await this.updateNote(id, {
+        aiMetadata: {
+          ...note.aiMetadata,
+          translations: {
+            ...note.aiMetadata?.translations,
+            [targetLanguage]: translatedContent,
+          },
+        },
+      });
+      
+      return translatedContent;
+    } catch (error) {
+      console.error('Failed to translate note:', error);
+      throw error;
+    }
+  }
+
+  // Get cached translation
+  async getCachedTranslation(id: string, targetLanguage: string): Promise<string | null> {
+    const note = await databaseService.getNote(id);
+    if (!note || !note.aiMetadata?.translations) return null;
+    
+    return note.aiMetadata.translations[targetLanguage] || null;
+  }
+
   // Add tag to note
   async addTag(id: string, tag: string): Promise<Note | null> {
     const note = await databaseService.getNote(id);

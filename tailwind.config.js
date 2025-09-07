@@ -7,25 +7,48 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // Odoo-inspired color palette
         primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
+          50: '#faf5f9',
+          100: '#f5ebf3',
+          200: '#e8d4e4',
+          300: '#d4adc8',
+          400: '#b97ea2',
+          500: '#875A7B', // Main Odoo purple
+          600: '#714b65',
+          700: '#5a3c50',
+          800: '#4a3242',
+          900: '#3f2a37',
         },
-        secondary: '#8b5cf6',
-        accent: '#f59e0b',
+        secondary: {
+          50: '#e6faf5',
+          100: '#ccf5eb',
+          200: '#99ebd7',
+          300: '#66e1c3',
+          400: '#44C7A1', // Odoo green
+          500: '#39a888',
+          600: '#2e8a6f',
+          700: '#246b56',
+          800: '#1d5644',
+          900: '#174138',
+        },
+        gray: {
+          50: '#FAFAFA',
+          100: '#F5F5F5',
+          200: '#F2F2F2', // Light gray from Odoo
+          300: '#E0E0E0',
+          400: '#BDBDBD',
+          500: '#9E9E9E',
+          600: '#757575',
+          700: '#616161',
+          800: '#424242',
+          900: '#212121',
+        },
         dark: {
-          bg: '#0f172a',
-          surface: '#1e293b',
-          elevated: '#334155',
-          text: '#e2e8f0',
+          bg: '#1a1a1a',
+          surface: '#2d2d2d',
+          elevated: '#3a3a3a',
+          text: '#f5f5f5',
         }
       },
       animation: {
@@ -84,8 +107,8 @@ module.exports = {
         'blur': 'blur(20px)',
       },
       fontFamily: {
-        'sans': ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        'display': ['Cal Sans', 'Inter', 'sans-serif'],
+        'sans': ['Noto Sans', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        'display': ['Noto Sans', 'Inter', 'sans-serif'],
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

@@ -9,15 +9,12 @@ import {
   Filter,
   Download,
   Upload,
-  Sparkles,
   StickyNote,
   X,
   Tag,
   Moon,
   Sun,
-  Key,
-  Zap,
-  TrendingUp
+  Key
 } from 'lucide-react';
 import NoteCard from '../components/Notes/NoteCard';
 import { Note } from '../types';
@@ -233,229 +230,209 @@ const HomePage: React.FC = () => {
   const allTags = Array.from(new Set(notes.flatMap(note => note.tags)));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-dark-bg dark:via-dark-surface dark:to-dark-elevated transition-colors duration-500">
-      {/* Animated Background */}
+    <div className="min-h-screen bg-gray-50 dark:bg-dark-bg transition-colors duration-200">
+      {/* Subtle gradient background - Odoo style */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float animation-delay-200" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float animation-delay-400" />
+        <div className="absolute top-0 left-0 right-0 h-96 bg-gradient-to-b from-primary-50 to-transparent dark:from-primary-900/10" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="mb-8"
-        >
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <motion.h1 
-                className="text-5xl font-black gradient-text-premium flex items-center gap-4"
-                initial={{ scale: 0.9 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 200 }}
-              >
-                <StickyNote size={48} className="text-primary-500" />
-                My Beautiful Notes
-              </motion.h1>
-              <motion.p 
-                className="text-gray-600 dark:text-gray-400 mt-3 text-lg flex items-center gap-4"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <span className="flex items-center gap-2">
-                  <TrendingUp size={18} className="text-primary-500" />
-                  <span className="font-semibold text-primary-600 dark:text-primary-400">{stats.totalNotes}</span> notes
-                </span>
-                <span className="text-gray-400">•</span>
-                <span className="flex items-center gap-2">
-                  <span className="font-semibold text-yellow-600 dark:text-yellow-400">{stats.pinnedNotes}</span> pinned
-                </span>
-                <span className="text-gray-400">•</span>
-                <span className="flex items-center gap-2">
-                  <span className="font-semibold text-red-600 dark:text-red-400">{stats.encryptedNotes}</span> encrypted
-                </span>
-              </motion.p>
-            </div>
-
-            <div className="flex items-center gap-3">
-              {/* Theme Toggle */}
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={toggleDarkMode}
-                className="p-3 glass dark:glass-dark rounded-xl hover:shadow-lg transition-all"
-              >
-                {darkMode ? <Sun size={20} className="text-yellow-500" /> : <Moon size={20} className="text-gray-600" />}
-              </motion.button>
-
-              {/* API Key Settings */}
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setShowApiKeyDialog(true)}
-                className={`p-3 glass dark:glass-dark rounded-xl hover:shadow-lg transition-all ${
-                  groqAIService.isReady() ? 'text-green-600' : 'text-gray-600'
-                }`}
-              >
-                <Key size={20} />
-              </motion.button>
-
-              {/* Import/Export */}
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleExport}
-                className="p-3 glass dark:glass-dark rounded-xl hover:shadow-lg transition-all"
-                title="Export notes"
-              >
-                <Download size={20} className="text-gray-600 dark:text-gray-400" />
-              </motion.button>
-              
-              <motion.label 
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className="p-3 glass dark:glass-dark rounded-xl hover:shadow-lg transition-all cursor-pointer"
-              >
-                <Upload size={20} className="text-gray-600 dark:text-gray-400" />
-                <input
-                  type="file"
-                  accept=".json"
-                  onChange={handleImport}
-                  className="hidden"
-                />
-              </motion.label>
-
-              {/* View Mode Toggle */}
-              <div className="flex glass dark:glass-dark rounded-xl p-1 shadow-lg">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2.5 rounded-lg transition-all ${
-                    viewMode === 'grid'
-                      ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg'
-                      : 'text-gray-600 dark:text-gray-400'
-                  }`}
-                >
-                  <Grid size={18} />
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setViewMode('list')}
-                  className={`p-2.5 rounded-lg transition-all ${
-                    viewMode === 'list'
-                      ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg'
-                      : 'text-gray-600 dark:text-gray-400'
-                  }`}
-                >
-                  <List size={18} />
-                </motion.button>
+      <div className="relative z-10">
+        {/* Clean Header - Odoo style */}
+        <header className="bg-white dark:bg-dark-surface border-b border-gray-200 dark:border-gray-700">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              {/* Logo and Title */}
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center">
+                  <StickyNote size={32} className="text-primary-500" />
+                  <h1 className="ml-3 text-2xl font-semibold text-gray-900 dark:text-white">
+                    Notes
+                  </h1>
+                </div>
+                <div className="hidden md:flex items-center space-x-6 ml-8">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    <span className="font-medium text-gray-900 dark:text-white">{stats.totalNotes}</span> notes
+                  </span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    <span className="font-medium text-primary-500">{stats.pinnedNotes}</span> pinned
+                  </span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    <span className="font-medium text-secondary-400">{stats.encryptedNotes}</span> secured
+                  </span>
+                </div>
               </div>
 
-              {/* Create Note Button */}
-              <motion.button
-                whileHover={{ scale: 1.05, rotate: 1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleCreateNote}
-                className="btn-premium flex items-center gap-2 text-white"
-              >
-                <Plus size={20} className="drop-shadow" />
-                <span className="hidden sm:inline font-bold">New Note</span>
-              </motion.button>
+              {/* Header Actions - Odoo style */}
+              <div className="flex items-center space-x-2">
+                {/* Theme Toggle */}
+                <button
+                  onClick={toggleDarkMode}
+                  className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                  title="Toggle theme"
+                >
+                  {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+                </button>
+
+                {/* API Key */}
+                <button
+                  onClick={() => setShowApiKeyDialog(true)}
+                  className={`p-2 transition-colors ${
+                    groqAIService.isReady() 
+                      ? 'text-secondary-400 hover:text-secondary-500' 
+                      : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                  }`}
+                  title="AI Settings"
+                >
+                  <Key size={20} />
+                </button>
+
+                {/* Export */}
+                <button
+                  onClick={handleExport}
+                  className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                  title="Export notes"
+                >
+                  <Download size={20} />
+                </button>
+                
+                {/* Import */}
+                <label className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors cursor-pointer">
+                  <Upload size={20} />
+                  <input
+                    type="file"
+                    accept=".json"
+                    onChange={handleImport}
+                    className="hidden"
+                  />
+                </label>
+
+                <div className="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-2" />
+
+                {/* View Mode Toggle */}
+                <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-md p-0.5">
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`px-3 py-1.5 rounded transition-colors text-sm font-medium ${
+                      viewMode === 'grid'
+                        ? 'bg-white dark:bg-gray-700 text-primary-500 shadow-sm'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                    }`}
+                  >
+                    <Grid size={16} className="inline" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`px-3 py-1.5 rounded transition-colors text-sm font-medium ${
+                      viewMode === 'list'
+                        ? 'bg-white dark:bg-gray-700 text-primary-500 shadow-sm'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                    }`}
+                  >
+                    <List size={16} className="inline" />
+                  </button>
+                </div>
+
+                {/* Create Note Button - Odoo style */}
+                <button
+                  onClick={handleCreateNote}
+                  className="ml-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-md font-medium transition-colors flex items-center space-x-2"
+                >
+                  <Plus size={18} />
+                  <span className="hidden sm:inline">New Note</span>
+                </button>
+              </div>
             </div>
           </div>
+        </header>
 
-          {/* Search and Filters */}
-          <motion.div 
-            className="flex gap-3"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <div className="flex-1 relative group">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 transition-colors group-focus-within:text-primary-500" size={20} />
-              <input
-                type="text"
-                placeholder="Search your notes..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3.5 glass dark:glass-dark rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400 transition-all placeholder-gray-500 dark:placeholder-gray-400 text-gray-700 dark:text-gray-200 shadow-lg"
-              />
-              {searchQuery && (
-                <motion.button
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                >
-                  <X size={18} className="text-gray-500" />
-                </motion.button>
-              )}
+        {/* Main Content Area */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          {/* Search and Filters - Odoo style */}
+          <div className="mb-6">
+            <div className="flex gap-3">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="text"
+                  placeholder="Search notes..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-10 py-2.5 bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-gray-900 dark:text-gray-100"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                  >
+                    <X size={18} />
+                  </button>
+                )}
+              </div>
+
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className={`px-4 py-2.5 rounded-md font-medium transition-colors flex items-center space-x-2 ${
+                  showFilters || selectedTags.length > 0
+                    ? 'bg-primary-500 text-white hover:bg-primary-600'
+                    : 'bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-elevated'
+                }`}
+              >
+                <Filter size={18} />
+                {selectedTags.length > 0 && (
+                  <span className="bg-white/20 px-1.5 py-0.5 rounded text-xs">
+                    {selectedTags.length}
+                  </span>
+                )}
+              </button>
             </div>
 
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setShowFilters(!showFilters)}
-              className={`px-4 py-3.5 glass dark:glass-dark rounded-xl transition-all shadow-lg ${
-                showFilters || selectedTags.length > 0
-                  ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white'
-                  : 'hover:bg-gray-50 dark:hover:bg-dark-elevated'
-              }`}
-            >
-              <Filter size={20} />
-            </motion.button>
-          </motion.div>
-
-          {/* Tag Filters */}
-          <AnimatePresence>
-            {showFilters && allTags.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                className="mt-4 overflow-hidden"
-              >
-                <div className="p-4 glass dark:glass-dark rounded-xl shadow-lg">
-                  <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-3">Filter by tags:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {allTags.map((tag, index) => (
-                      <motion.button
-                        key={tag}
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ delay: index * 0.05 }}
-                        onClick={() => {
-                          setSelectedTags(prev =>
-                            prev.includes(tag)
-                              ? prev.filter(t => t !== tag)
-                              : [...prev, tag]
-                          );
-                        }}
-                        className={`px-3.5 py-1.5 rounded-full text-sm font-medium transition-all transform hover:scale-105 ${
-                          selectedTags.includes(tag)
-                            ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/30'
-                            : 'glass dark:glass-dark hover:bg-white/70 dark:hover:bg-white/20'
-                        }`}
-                      >
-                        <span className="flex items-center gap-1">
-                          <Tag size={12} />
+            {/* Tag Filters - Odoo style */}
+            <AnimatePresence>
+              {showFilters && allTags.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="mt-3 overflow-hidden"
+                >
+                  <div className="p-4 bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-700 rounded-md">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Filter by tags</p>
+                    <div className="flex flex-wrap gap-2">
+                      {allTags.map((tag) => (
+                        <button
+                          key={tag}
+                          onClick={() => {
+                            setSelectedTags(prev =>
+                              prev.includes(tag)
+                                ? prev.filter(t => t !== tag)
+                                : [...prev, tag]
+                            );
+                          }}
+                          className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                            selectedTags.includes(tag)
+                              ? 'bg-primary-500 text-white hover:bg-primary-600'
+                              : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                          }`}
+                        >
+                          <Tag size={12} className="inline mr-1" />
                           {tag}
-                        </span>
-                      </motion.button>
-                    ))}
+                        </button>
+                      ))}
+                      {selectedTags.length > 0 && (
+                        <button
+                          onClick={() => setSelectedTags([])}
+                          className="px-3 py-1 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                        >
+                          Clear all
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
         {/* Notes Grid/List */}
         {isLoading ? (
@@ -472,52 +449,34 @@ const HomePage: React.FC = () => {
                   transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                 />
               </div>
-              <p className="text-gray-600 dark:text-gray-400 text-lg">Loading your beautiful notes...</p>
+              <p className="text-gray-600 dark:text-gray-400">Loading notes...</p>
             </motion.div>
           </div>
         ) : filteredNotes.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center py-20"
-          >
-            <motion.div
-              animate={{ 
-                scale: [1, 1.1, 1],
-                rotate: [0, 5, -5, 0]
-              }}
-              transition={{ 
-                duration: 2,
-                repeat: Infinity,
-                repeatType: "reverse"
-              }}
-            >
-              <Sparkles className="w-24 h-24 mx-auto mb-6 text-primary-400" />
-            </motion.div>
-            <h3 className="text-3xl font-bold gradient-text mb-3">
+          <div className="text-center py-16">
+            <div className="w-20 h-20 mx-auto mb-6 text-gray-300 dark:text-gray-600">
+              <StickyNote size={80} />
+            </div>
+            <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
               {searchQuery || selectedTags.length > 0
                 ? 'No notes found'
-                : 'Your canvas awaits!'}
+                : 'Start taking notes'}
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-8 text-lg max-w-md mx-auto">
+            <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
               {searchQuery || selectedTags.length > 0
                 ? 'Try adjusting your search or filters'
-                : 'Create your first note and start capturing your brilliant ideas'}
+                : 'Create your first note to get started'}
             </p>
             {!(searchQuery || selectedTags.length > 0) && (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+              <button
                 onClick={handleCreateNote}
-                className="btn-premium text-white font-bold text-lg px-8 py-4"
+                className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-md font-medium transition-colors inline-flex items-center space-x-2"
               >
-                <span className="flex items-center gap-2">
-                  <Zap size={20} />
-                  Create Your First Note
-                </span>
-              </motion.button>
+                <Plus size={20} />
+                <span>Create Note</span>
+              </button>
             )}
-          </motion.div>
+          </div>
         ) : (
           <div
             className={
@@ -540,48 +499,56 @@ const HomePage: React.FC = () => {
             ))}
           </div>
         )}
+        </div>
       </div>
 
-      {/* API Key Dialog */}
+      {/* API Key Dialog - Odoo style */}
       <AnimatePresence>
         {showApiKeyDialog && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4"
             onClick={() => setShowApiKeyDialog(false)}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="glass dark:glass-dark rounded-2xl p-8 max-w-md w-full shadow-2xl"
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white dark:bg-dark-surface rounded-lg shadow-xl max-w-md w-full"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-2xl font-bold gradient-text mb-4">Configure AI Features</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
-                Enter your Groq API key to enable AI-powered features like smart summaries, tag suggestions, and grammar checking.
-              </p>
-              <input
-                type="password"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                placeholder="gsk_..."
-                className="w-full px-4 py-3 glass dark:glass-dark rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 mb-6"
-              />
-              <div className="flex justify-end gap-3">
+              <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">AI Configuration</h3>
+              </div>
+              <div className="p-6">
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  Connect your Groq API key to enable AI-powered features.
+                </p>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  API Key
+                </label>
+                <input
+                  type="password"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  placeholder="gsk_..."
+                  className="w-full px-3 py-2 bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                />
+              </div>
+              <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
                 <button
                   onClick={() => setShowApiKeyDialog(false)}
-                  className="px-6 py-2.5 text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"
+                  className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSaveApiKey}
-                  className="px-6 py-2.5 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl hover:shadow-lg transition-all"
+                  className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-md font-medium transition-colors"
                 >
-                  Save API Key
+                  Save
                 </button>
               </div>
             </motion.div>

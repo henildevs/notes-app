@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   ArrowLeft,
   Save,
@@ -12,17 +12,19 @@ import {
   CheckCircle,
   AlertCircle,
   X,
-  Languages,
   BookOpen,
   Wand2,
   Hash,
   FileText,
   Zap,
+  Languages,
 } from 'lucide-react';
 import RichTextEditor from '../components/Editor/RichTextEditor';
-import { Note, GlossaryTerm, GrammarError } from '../types';
+import TranslationPanel from '../components/Translation/TranslationPanel';
+import { Note } from '../types';
 import { noteService } from '../services/noteService';
 import { groqAIService } from '../services/groqAI';
+import { databaseService } from '../services/database';
 
 const EditorPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -37,19 +39,31 @@ const EditorPage: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [showGlossaryTerms, setShowGlossaryTerms] = useState(false);
   const [showGrammarErrors, setShowGrammarErrors] = useState(false);
-  const [selectedTerm, setSelectedTerm] = useState<GlossaryTerm | null>(null);
+  const [showTranslationPanel, setShowTranslationPanel] = useState(false);
 
-  // Load note on mount
+  // Initialize theme and AI service on mount
   useEffect(() => {
-    if (id) {
-      loadNote();
-    } else {
-      // Create new note
-      createNewNote();
-    }
-  }, [id]);
+    loadTheme();
+    checkApiKey();
+  }, []);
 
-  const loadNote = async () => {
+  const loadTheme = async () => {
+    const prefs = await databaseService.getPreferences();
+    if (prefs.theme === 'dark' || (prefs.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
+
+  const checkApiKey = async () => {
+    const prefs = await databaseService.getPreferences();
+    if (prefs.groqApiKey) {
+      groqAIService.initialize(prefs.groqApiKey);
+    }
+  };
+
+  const loadNote = useCallback(async () => {
     if (!id) return;
     
     setIsLoading(true);
@@ -73,9 +87,9 @@ const EditorPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [id, navigate]);
 
-  const createNewNote = async () => {
+  const createNewNote = useCallback(async () => {
     try {
       const newNote = await noteService.createNote('Untitled Note', '');
       setNote(newNote);
@@ -87,7 +101,17 @@ const EditorPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [navigate]);
+
+  // Load note on mount
+  useEffect(() => {
+    if (id) {
+      loadNote();
+    } else {
+      // Create new note
+      createNewNote();
+    }
+  }, [id, loadNote, createNewNote]);
 
   const handleContentChange = useCallback((content: string, plainText: string) => {
     if (!note) return;
@@ -374,7 +398,7 @@ const EditorPage: React.FC = () => {
                     onClick={() => setShowAIPanel(!showAIPanel)}
                     className={`p-3 rounded-xl transition-all shadow-lg ${
                       showAIPanel
-                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-purple-500/30'
+                        ? 'bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-purple-500/30'
                         : 'glass dark:glass-dark hover:bg-purple-50 dark:hover:bg-purple-900/20'
                     }`}
                     title="AI Features"
@@ -466,7 +490,7 @@ const EditorPage: React.FC = () => {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="p-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl"
+                        className="p-3 bg-gradient-to-r from-purple-50 to-cyan-50 dark:from-purple-900/20 dark:to-cyan-900/20 rounded-xl"
                       >
                         <div className="font-semibold text-purple-700 dark:text-purple-300 mb-1">
                           {term.term}
@@ -588,7 +612,7 @@ const EditorPage: React.FC = () => {
                   initial={{ opacity: 0, x: 20, scale: 0.95 }}
                   animate={{ opacity: 1, x: 0, scale: 1 }}
                   transition={{ delay: 0.4, type: "spring" }}
-                  className="glass dark:glass-dark rounded-2xl shadow-xl border border-white/20 dark:border-white/10 p-6 bg-gradient-to-br from-purple-50/50 to-pink-50/50 dark:from-purple-900/10 dark:to-pink-900/10"
+                  className="glass dark:glass-dark rounded-2xl shadow-xl border border-white/20 dark:border-white/10 p-6 bg-gradient-to-br from-purple-50/50 to-cyan-50/50 dark:from-purple-900/10 dark:to-cyan-900/10"
                 >
                   <h3 className="font-bold text-lg mb-4 flex items-center gap-2 gradient-text">
                     <Brain size={20} className="text-purple-500" />
@@ -600,9 +624,9 @@ const EditorPage: React.FC = () => {
                     <motion.div 
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
-                      className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl border border-blue-200/50 dark:border-blue-700/30"
+                      className="mb-4 p-4 bg-gradient-to-r from-purple-50 to-cyan-50 dark:from-purple-900/20 dark:to-cyan-900/20 rounded-xl border border-purple-200/50 dark:border-purple-700/30"
                     >
-                      <p className="text-sm text-blue-700 dark:text-blue-300 leading-relaxed">
+                      <p className="text-sm text-purple-700 dark:text-purple-300 leading-relaxed">
                         ✨ {note.aiMetadata.summary}
                       </p>
                     </motion.div>
@@ -614,7 +638,7 @@ const EditorPage: React.FC = () => {
                       whileTap={{ scale: 0.98 }}
                       onClick={handleGenerateSummary}
                       disabled={aiLoading}
-                      className="px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 transition-all text-sm font-semibold shadow-lg flex items-center justify-center gap-2"
+                      className="px-4 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl hover:from-purple-600 hover:to-indigo-600 disabled:opacity-50 transition-all text-sm font-semibold shadow-lg flex items-center justify-center gap-2"
                     >
                       {aiLoading && aiLoadingFeature === 'summary' ? (
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -629,7 +653,7 @@ const EditorPage: React.FC = () => {
                       whileTap={{ scale: 0.98 }}
                       onClick={handleGenerateTags}
                       disabled={aiLoading}
-                      className="px-4 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl hover:from-blue-600 hover:to-cyan-600 disabled:opacity-50 transition-all text-sm font-semibold shadow-lg flex items-center justify-center gap-2"
+                      className="px-4 py-3 bg-gradient-to-r from-purple-500 to-cyan-500 text-white rounded-xl hover:from-purple-600 hover:to-cyan-600 disabled:opacity-50 transition-all text-sm font-semibold shadow-lg flex items-center justify-center gap-2"
                     >
                       {aiLoading && aiLoadingFeature === 'tags' ? (
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -669,6 +693,17 @@ const EditorPage: React.FC = () => {
                       <span>Grammar</span>
                     </motion.button>
                   </div>
+
+                  {/* Translation Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setShowTranslationPanel(true)}
+                    className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all text-sm font-semibold shadow-lg flex items-center justify-center gap-2 mt-3"
+                  >
+                    <Languages size={16} />
+                    <span>Translate</span>
+                  </motion.button>
 
                   <div className="mt-4 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-xl">
                     <p className="text-xs text-yellow-700 dark:text-yellow-300 flex items-center gap-2">
@@ -718,6 +753,15 @@ const EditorPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Translation Panel */}
+      {showTranslationPanel && note && (
+        <TranslationPanel
+          noteId={note.id}
+          originalContent={note.content}
+          onClose={() => setShowTranslationPanel(false)}
+        />
+      )}
     </div>
   );
 };
