@@ -1,13 +1,161 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply box-border;
+  }
+  
+  html {
+    @apply antialiased;
+  }
+  
+  body {
+    @apply bg-gray-50 dark:bg-dark-bg text-gray-900 dark:text-dark-text;
+    @apply transition-colors duration-300;
+  }
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@layer components {
+  /* Glass morphism effect */
+  .glass {
+    @apply bg-white/70 backdrop-blur-xl border border-white/20;
+  }
+  
+  .glass-dark {
+    @apply bg-dark-surface/70 backdrop-blur-xl border border-white/10;
+  }
+  
+  /* Premium button styles */
+  .btn-premium {
+    @apply px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600;
+    @apply rounded-xl font-semibold shadow-lg;
+    @apply hover:from-primary-600 hover:to-primary-700;
+    @apply transform hover:scale-105 transition-all duration-200;
+    @apply hover:shadow-xl hover:shadow-primary-500/25;
+    @apply active:scale-95;
+  }
+  
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary-600 to-secondary;
+    @apply bg-clip-text text-transparent;
+  }
+  
+  .gradient-text-premium {
+    @apply bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600;
+    @apply bg-clip-text text-transparent animate-gradient;
+    background-size: 200% auto;
+  }
+  
+  /* Card hover effects */
+  .card-hover {
+    @apply transition-all duration-300;
+    @apply hover:translate-y-[-4px] hover:shadow-2xl;
+  }
+  
+  /* Neon glow effect */
+  .neon-glow {
+    @apply shadow-lg;
+    box-shadow: 
+      0 0 5px theme('colors.primary.400'),
+      0 0 20px theme('colors.primary.400'),
+      0 0 40px theme('colors.primary.400'),
+      0 0 80px theme('colors.primary.400');
+  }
+  
+  /* Custom scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    @apply w-2;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-dark-surface rounded-full;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gradient-to-b from-primary-400 to-primary-600 rounded-full;
+  }
+  
+  /* Rich text editor styles */
+  .editor-toolbar {
+    @apply flex items-center gap-1 p-3 border-b border-gray-200 dark:border-gray-700;
+    @apply bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-surface dark:to-dark-elevated;
+  }
+  
+  .editor-button {
+    @apply p-2 rounded-lg hover:bg-white dark:hover:bg-dark-elevated;
+    @apply transition-all duration-200 border border-transparent;
+    @apply hover:border-primary-300 dark:hover:border-primary-700;
+    @apply hover:shadow-md active:scale-95;
+  }
+  
+  .editor-button-active {
+    @apply bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300;
+    @apply border-primary-300 dark:border-primary-700 shadow-md;
+  }
+  
+  /* Note card animations */
+  .note-card {
+    @apply relative overflow-hidden;
+  }
+  
+  .note-card::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent;
+    @apply -translate-x-full;
+    @apply transition-transform duration-1000;
+  }
+  
+  .note-card:hover::before {
+    @apply translate-x-full;
+  }
+}
+
+@layer utilities {
+  /* Text selection */
+  .selection-primary ::selection {
+    @apply bg-primary-200 text-primary-900;
+  }
+  
+  /* Smooth scroll */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+  }
+  
+  /* Animation delays */
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+  
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+  
+  .animation-delay-600 {
+    animation-delay: 600ms;
+  }
+}
+
+/* Beautiful gradient backgrounds */
+.bg-gradient-mesh {
+  background: 
+    linear-gradient(to right, #667eea 0%, #764ba2 25%, #f093fb 50%, #faa5e5 75%, #fed6e3 100%),
+    linear-gradient(to bottom, #667eea 0%, #764ba2 25%, #f093fb 50%, #faa5e5 75%, #fed6e3 100%);
+  background-blend-mode: multiply;
+}
+
+/* Loading spinner */
+.spinner {
+  @apply inline-block w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin;
+}
+
+/* Skeleton loading */
+.skeleton {
+  @apply bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-dark-surface dark:via-dark-elevated dark:to-dark-surface;
+  @apply animate-shimmer;
+  background-size: 200% 100%;
 }
