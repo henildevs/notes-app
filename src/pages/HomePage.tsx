@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -18,6 +18,7 @@ import {
   Lock
 } from 'lucide-react';
 import NoteCard from '../components/Notes/NoteCard';
+import { useSearch } from '../hooks/useSearch';
 import { Note } from '../types';
 import { noteService } from '../services/noteService';
 import { groqAIService } from '../services/groqAI';
@@ -26,15 +27,19 @@ import { databaseService } from '../services/database';
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const [notes, setNotes] = useState<Note[]>([]);
-  const [filteredNotes, setFilteredNotes] = useState<Note[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [isLoading, setIsLoading] = useState(true);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
   const [apiKey, setApiKey] = useState('');
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    // Initialize with system theme to prevent flash
+    if (typeof window !== 'undefined') {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
+  });
   const [showLockDialog, setShowLockDialog] = useState(false);
   const [lockPassword, setLockPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -51,6 +56,9 @@ const HomePage: React.FC = () => {
     totalTags: 0,
   });
 
+  // Use optimized search hook
+  const { notes: searchResults, query: searchQuery, updateQuery, clearQuery } = useSearch(notes);
+
   // Load notes on mount
   useEffect(() => {
     loadNotes();
@@ -59,33 +67,16 @@ const HomePage: React.FC = () => {
     loadTheme();
   }, []);
 
-  // Filter notes when search or filters change
-  useEffect(() => {
-    const filterNotes = () => {
-      let filtered = [...notes];
-
-      // Search filter
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        filtered = filtered.filter(note =>
-          note.title.toLowerCase().includes(query) ||
-          note.plainTextContent?.toLowerCase().includes(query) ||
-          note.tags.some(tag => tag.toLowerCase().includes(query))
-        );
-      }
-
-      // Tag filter
-      if (selectedTags.length > 0) {
-        filtered = filtered.filter(note =>
-          selectedTags.every(tag => note.tags.includes(tag))
-        );
-      }
-
-      setFilteredNotes(filtered);
-    };
+  // Apply tag filters to search results
+  const filteredNotes = useMemo(() => {
+    if (selectedTags.length === 0) {
+      return searchResults;
+    }
     
-    filterNotes();
-  }, [searchQuery, selectedTags, notes]);
+    return searchResults.filter(note =>
+      selectedTags.every(tag => note.tags.includes(tag))
+    );
+  }, [searchResults, selectedTags]);
 
   const loadTheme = async () => {
     const prefs = await databaseService.getPreferences();
@@ -417,12 +408,12 @@ const HomePage: React.FC = () => {
                   type="text"
                   placeholder="Search notes..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => updateQuery(e.target.value)}
                   className="w-full pl-9 sm:pl-10 pr-9 sm:pr-10 py-2 sm:py-2.5 bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-gray-900 dark:text-gray-100 text-sm sm:text-base"
                 />
                 {searchQuery && (
                   <button
-                    onClick={() => setSearchQuery('')}
+                    onClick={clearQuery}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                   >
                     <X size={16} />

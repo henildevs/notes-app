@@ -17,6 +17,14 @@
     @apply bg-white dark:bg-dark-bg text-gray-800 dark:text-dark-text;
     @apply transition-colors duration-200;
   }
+
+  /* Prevent white flash on page load */
+  @media (prefers-color-scheme: dark) {
+    body {
+      background-color: #1a1a1a;
+      color: #f5f5f5;
+    }
+  }
 }
 
 @layer components {
