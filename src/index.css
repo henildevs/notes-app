@@ -111,14 +111,13 @@
   
   /* Rich text editor styles */
   .editor-toolbar {
-    @apply flex items-center gap-1 p-3 border-b border-gray-200 dark:border-gray-700;
+    @apply flex items-center gap-1 p-3;
     @apply bg-gradient-to-r from-gray-50 to-gray-100 dark:from-dark-surface dark:to-dark-elevated;
   }
   
   .editor-button {
     @apply p-2 rounded-lg hover:bg-white dark:hover:bg-dark-elevated;
-    @apply transition-all duration-200 border border-transparent;
-    @apply hover:border-primary-300 dark:hover:border-primary-700;
+    @apply transition-all duration-200;
     @apply hover:shadow-md active:scale-95;
   }
   
@@ -129,12 +128,12 @@
   
   /* Glass effect for AI button */
   .glass {
-    @apply bg-white/80 backdrop-blur-sm border border-white/20;
+    @apply bg-white/80 backdrop-blur-sm;
     @apply shadow-lg;
   }
   
   .glass-dark {
-    @apply bg-dark-surface/80 backdrop-blur-sm border border-white/10;
+    @apply bg-dark-surface/80 backdrop-blur-sm;
     @apply shadow-lg;
   }
   

@@ -423,7 +423,7 @@ const EditorPage: React.FC = () => {
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="glass dark:glass-dark backdrop-blur-xl border-b border-white/20 dark:border-white/10 sticky top-0 z-50"
+          className="glass dark:glass-dark backdrop-blur-xl sticky top-0 z-50"
         >
           <div className="max-w-7xl mx-auto px-4 py-5">
             <div className="flex items-center justify-between">
@@ -535,7 +535,7 @@ const EditorPage: React.FC = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <div className="glass dark:glass-dark rounded-2xl shadow-xl border border-white/20 dark:border-white/10 overflow-visible">
+              <div className="bg-white/80 dark:bg-dark-surface/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 dark:border-white/10 overflow-visible">
                 {/* Encrypted Note Unlock Interface */}
                 {note.isEncrypted && !note.content && (
                   <div className="p-8 text-center">
@@ -604,7 +604,7 @@ const EditorPage: React.FC = () => {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-6 glass dark:glass-dark rounded-2xl shadow-xl border border-white/20 dark:border-white/10 p-6"
+                  className="mt-6 bg-white/80 dark:bg-dark-surface/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 dark:border-white/10 p-6"
                 >
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-bold text-lg flex items-center gap-2 gradient-text">
@@ -641,7 +641,7 @@ const EditorPage: React.FC = () => {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-6 glass dark:glass-dark rounded-2xl shadow-xl border border-white/20 dark:border-white/10 p-6"
+                  className="mt-6 bg-white/80 dark:bg-dark-surface/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 dark:border-white/10 p-6"
                 >
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-bold text-lg flex items-center gap-2 gradient-text">
@@ -687,7 +687,7 @@ const EditorPage: React.FC = () => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
-                className="glass dark:glass-dark rounded-2xl shadow-xl border border-white/20 dark:border-white/10 p-6"
+                className="bg-white/80 dark:bg-dark-surface/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 dark:border-white/10 p-6"
               >
                 <h3 className="font-bold text-lg mb-4 flex items-center gap-2 gradient-text">
                   <Tag size={20} className="text-primary-500" />
@@ -743,7 +743,7 @@ const EditorPage: React.FC = () => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.5 }}
-                className="glass dark:glass-dark rounded-2xl shadow-xl border border-white/20 dark:border-white/10 p-6"
+                className="bg-white/80 dark:bg-dark-surface/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 dark:border-white/10 p-6"
               >
                 <h3 className="font-bold text-lg mb-4 gradient-text">Statistics</h3>
                 <div className="space-y-3">
