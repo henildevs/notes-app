@@ -434,13 +434,13 @@ const EditorPage: React.FC = () => {
                   <ArrowLeft size={18} className="text-gray-700 dark:text-gray-300" />
                 </motion.button>
                 
-                <div className="relative flex-1">
+                <div className="relative flex-1 min-w-0 px-2">
                   <input
                     type="text"
                     value={note.title}
                     onChange={handleTitleChange}
                     placeholder="Enter your note title..."
-                    className="text-3xl font-black bg-transparent outline-none placeholder-gray-400 dark:placeholder-gray-500 gradient-text-premium w-full"
+                    className="text-3xl font-black bg-transparent outline-none placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-white w-full"
                   />
                   <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-primary-500 to-secondary opacity-30" />
                 </div>
