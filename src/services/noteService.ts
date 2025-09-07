@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Note } from '../types';
+import { Note, NoteVersion } from '../types';
 import { databaseService } from './database';
 import { encryptionService } from './encryption';
 import { groqAIService } from './groqAI';
@@ -337,6 +337,114 @@ class NoteService {
       totalTags: allTags.size,
       recentNotes: notes.slice(0, 5),
     };
+  }
+
+  // Version History Methods
+  
+  // Create a new version of a note
+  async createVersion(noteId: string, content: string, title: string): Promise<NoteVersion | null> {
+    const note = await databaseService.getNote(noteId);
+    if (!note) return null;
+
+    const versionNumber = (note.version || 0) + 1;
+    const version: NoteVersion = {
+      id: uuidv4(),
+      noteId,
+      content,
+      title,
+      timestamp: new Date(),
+      versionNumber,
+    };
+
+    // Update note with new version number and add version to versions array
+    const updatedNote: Note = {
+      ...note,
+      version: versionNumber,
+      versions: [...(note.versions || []), version],
+    };
+
+    await databaseService.saveNote(updatedNote);
+    return version;
+  }
+
+  // Get all versions for a note
+  async getNoteVersions(noteId: string): Promise<NoteVersion[]> {
+    const note = await databaseService.getNote(noteId);
+    return note?.versions || [];
+  }
+
+  // Get a specific version
+  async getVersion(noteId: string, versionId: string): Promise<NoteVersion | null> {
+    const versions = await this.getNoteVersions(noteId);
+    return versions.find(v => v.id === versionId) || null;
+  }
+
+  // Restore a note to a specific version
+  async restoreToVersion(noteId: string, versionId: string): Promise<Note | null> {
+    const version = await this.getVersion(noteId, versionId);
+    if (!version) return null;
+
+    const note = await databaseService.getNote(noteId);
+    if (!note) return null;
+
+    const restoredNote: Note = {
+      ...note,
+      title: version.title,
+      content: version.content,
+      plainTextContent: this.extractPlainText(version.content),
+      updatedAt: new Date(),
+    };
+
+    await databaseService.saveNote(restoredNote);
+    return restoredNote;
+  }
+
+  // Delete a specific version
+  async deleteVersion(noteId: string, versionId: string): Promise<boolean> {
+    const note = await databaseService.getNote(noteId);
+    if (!note || !note.versions) return false;
+
+    const updatedVersions = note.versions.filter(v => v.id !== versionId);
+    const updatedNote: Note = {
+      ...note,
+      versions: updatedVersions,
+    };
+
+    await databaseService.saveNote(updatedNote);
+    return true;
+  }
+
+  // Clear all versions for a note
+  async clearVersions(noteId: string): Promise<boolean> {
+    const note = await databaseService.getNote(noteId);
+    if (!note) return false;
+
+    const updatedNote: Note = {
+      ...note,
+      versions: [],
+      version: 0,
+    };
+
+    await databaseService.saveNote(updatedNote);
+    return true;
+  }
+
+  // Update note with automatic version creation
+  async updateNoteWithVersion(id: string, updates: Partial<Note>): Promise<Note | null> {
+    const existingNote = await databaseService.getNote(id);
+    if (!existingNote) return null;
+
+    // Only create version if content or title changed significantly
+    const shouldCreateVersion = 
+      (updates.content && updates.content !== existingNote.content) ||
+      (updates.title && updates.title !== existingNote.title);
+
+    if (shouldCreateVersion) {
+      await this.createVersion(id, existingNote.content, existingNote.title);
+    }
+
+    // Update the note
+    return this.updateNote(id, updates);
   }
 
 }

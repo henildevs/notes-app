@@ -14,9 +14,11 @@ import {
   X,
   BookOpen,
   Languages,
+  History,
 } from 'lucide-react';
 import RichTextEditor from '../components/Editor/RichTextEditor';
 import TranslationPanel from '../components/Translation/TranslationPanel';
+import VersionHistory from '../components/VersionHistory/VersionHistory';
 import { Note } from '../types';
 import { noteService } from '../services/noteService';
 import { groqAIService } from '../services/groqAI';
@@ -44,6 +46,7 @@ const EditorPage: React.FC = () => {
   const [showLockDialog, setShowLockDialog] = useState(false);
   const [lockPassword, setLockPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showVersionHistory, setShowVersionHistory] = useState(false);
 
   // Initialize theme and AI service on mount
   const loadTheme = async () => {
@@ -224,7 +227,7 @@ const EditorPage: React.FC = () => {
     
     setIsSaving(true);
     try {
-      await noteService.updateNote(note.id, note);
+      await noteService.updateNoteWithVersion(note.id, note);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 2000);
     } catch (error) {
@@ -482,6 +485,17 @@ const EditorPage: React.FC = () => {
                   title={note.isPinned ? 'Unpin' : 'Pin'}
                 >
                   <Pin size={18} className={note.isPinned ? 'fill-current drop-shadow' : ''} />
+                </motion.button>
+
+                {/* Version History Button */}
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowVersionHistory(true)}
+                  className="p-3 glass dark:glass-dark rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all shadow-lg"
+                  title="Version History"
+                >
+                  <History size={18} className="text-gray-700 dark:text-gray-300" />
                 </motion.button>
 
                 {/* Save Button */}
@@ -770,6 +784,20 @@ const EditorPage: React.FC = () => {
           noteId={note.id}
           originalContent={note.content}
           onClose={() => setShowTranslationPanel(false)}
+        />
+      )}
+
+      {/* Version History */}
+      {showVersionHistory && note && (
+        <VersionHistory
+          noteId={note.id}
+          isOpen={showVersionHistory}
+          onClose={() => setShowVersionHistory(false)}
+          onRestore={(version) => {
+            // Reload the note after restoration
+            loadNote();
+            setShowVersionHistory(false);
+          }}
         />
       )}
 

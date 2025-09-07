@@ -89,10 +89,10 @@ const NoteCard: React.FC<NoteCardProps> = ({
         duration: 0.15,
         delay: index * 0.02
       }}
-      className="note-card relative group">
+      className="note-card relative group overflow-visible">
       <div
         className={`
-          relative cursor-pointer
+          relative cursor-pointer overflow-visible
           bg-white dark:bg-dark-surface
           rounded-lg shadow-sm hover:shadow-md
           border border-gray-200 dark:border-gray-700
@@ -142,7 +142,7 @@ const NoteCard: React.FC<NoteCardProps> = ({
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="absolute right-0 top-full mt-1 bg-white dark:bg-dark-surface rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50 min-w-[160px] py-1"
+                  className="absolute right-0 top-full mt-1 bg-white dark:bg-dark-surface rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-[100] min-w-[160px] py-1"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button

@@ -135,21 +135,26 @@
     @apply relative overflow-hidden;
   }
   
+  /* Temporarily disabled note card animation to fix gradient overlay issue */
+  /*
   .note-card::before {
     content: '';
-    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent;
-    @apply -translate-x-full;
-    @apply transition-transform duration-1000;
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent;
+    @apply -translate-x-full opacity-0;
+    @apply transition-all duration-1000;
+    pointer-events: none;
   }
   
   .note-card:hover::before {
-    @apply translate-x-full;
+    @apply translate-x-full opacity-100;
   }
+  */
   
   /* Masonry Layout */
   .masonry-layout {
     column-gap: 1rem;
     column-fill: balance;
+    overflow: visible;
   }
   
   .masonry-layout.columns-1 {
