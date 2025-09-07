@@ -34,7 +34,6 @@ const HomePage: React.FC = () => {
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
   const [apiKey, setApiKey] = useState('');
   const [darkMode, setDarkMode] = useState(() => {
-    // Initialize with system theme to prevent flash
     if (typeof window !== 'undefined') {
       return window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
@@ -56,10 +55,8 @@ const HomePage: React.FC = () => {
     totalTags: 0,
   });
 
-  // Use optimized search hook
   const { notes: searchResults, query: searchQuery, updateQuery, clearQuery } = useSearch(notes);
 
-  // Load notes on mount
   useEffect(() => {
     loadNotes();
     loadStats();
@@ -67,7 +64,6 @@ const HomePage: React.FC = () => {
     loadTheme();
   }, []);
 
-  // Apply tag filters to search results
   const filteredNotes = useMemo(() => {
     if (selectedTags.length === 0) {
       return searchResults;
@@ -160,21 +156,17 @@ const HomePage: React.FC = () => {
     if (!note) return;
 
     if (note.isEncrypted) {
-      // Decrypt - use modal
       setSelectedNoteForUnlock(note);
       setShowUnlockDialog(true);
     } else if (!note.hasBeenEncrypted) {
-      // Encrypt - use modal (only if never been encrypted)
       setSelectedNoteForLock(note);
       setShowLockDialog(true);
     }
-    // If hasBeenEncrypted is true and isEncrypted is false, do nothing
   };
 
   const handleLockNote = async () => {
     if (!selectedNoteForLock || !lockPassword.trim()) return;
     
-    // Check password confirmation
     if (lockPassword !== confirmPassword) {
       alert('Passwords do not match. Please try again.');
       return;
@@ -209,7 +201,6 @@ const HomePage: React.FC = () => {
       const decryptedNote = await noteService.decryptNote(selectedNoteForUnlock.id, unlockPassword);
       
       if (decryptedNote) {
-        // Update the notes list with the decrypted note
         setNotes(prevNotes => 
           prevNotes.map(note => 
             note.id === selectedNoteForUnlock.id ? decryptedNote : note
@@ -268,22 +259,18 @@ const HomePage: React.FC = () => {
     }
   };
 
-  // Get all unique tags
   const allTags = Array.from(new Set(notes.flatMap(note => note.tags)));
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-dark-bg transition-colors duration-200 overflow-visible">
-      {/* Subtle gradient background - Odoo style */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-0 right-0 h-96 bg-gradient-to-b from-primary-50/30 to-transparent dark:from-primary-900/5" />
       </div>
 
       <div className="relative z-10">
-        {/* Clean Header - Odoo style */}
         <header className="bg-white dark:bg-dark-surface border-b border-gray-200 dark:border-gray-700">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
-              {/* Logo and Title */}
               <div className="flex items-center space-x-2 sm:space-x-4">
                 <div className="flex items-center">
                   <StickyNote size={24} className="sm:w-8 sm:h-8 text-primary-500" />
@@ -304,9 +291,7 @@ const HomePage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Header Actions - Odoo style */}
               <div className="flex items-center space-x-1 sm:space-x-2">
-                {/* Mobile Stats - Show on small screens */}
                 <div className="flex items-center space-x-3 lg:hidden">
                   <span className="text-xs text-gray-600 dark:text-gray-400">
                     <span className="font-medium text-gray-900 dark:text-white">{stats.totalNotes}</span>
@@ -316,7 +301,6 @@ const HomePage: React.FC = () => {
                   </span>
                 </div>
 
-                {/* Theme Toggle */}
                 <button
                   onClick={toggleDarkMode}
                   className="p-1.5 sm:p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
@@ -325,7 +309,6 @@ const HomePage: React.FC = () => {
                   {darkMode ? <Sun size={18} className="sm:w-5 sm:h-5" /> : <Moon size={18} className="sm:w-5 sm:h-5" />}
                 </button>
 
-                {/* API Key - Hidden on mobile */}
                 <button
                   onClick={() => setShowApiKeyDialog(true)}
                   className={`hidden sm:block p-1.5 sm:p-2 transition-colors ${
@@ -338,7 +321,6 @@ const HomePage: React.FC = () => {
                   <Key size={18} className="sm:w-5 sm:h-5" />
                 </button>
 
-                {/* Export - Hidden on mobile */}
                 <button
                   onClick={handleExport}
                   className="hidden sm:block p-1.5 sm:p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
@@ -347,7 +329,6 @@ const HomePage: React.FC = () => {
                   <Download size={18} className="sm:w-5 sm:h-5" />
                 </button>
                 
-                {/* Import - Hidden on mobile */}
                 <label className="hidden sm:block p-1.5 sm:p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors cursor-pointer">
                   <Upload size={18} className="sm:w-5 sm:h-5" />
                   <input
@@ -360,7 +341,6 @@ const HomePage: React.FC = () => {
 
                 <div className="hidden sm:block h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1 sm:mx-2" />
 
-                {/* View Mode Toggle */}
                 <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-md p-0.5">
                   <button
                     onClick={() => setViewMode('grid')}
@@ -384,7 +364,6 @@ const HomePage: React.FC = () => {
                   </button>
                 </div>
 
-                {/* Create Note Button - Odoo style */}
                 <button
                   onClick={handleCreateNote}
                   className="ml-1 sm:ml-2 px-2 sm:px-4 py-1.5 sm:py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-md font-medium transition-colors flex items-center space-x-1 sm:space-x-2"
@@ -397,9 +376,7 @@ const HomePage: React.FC = () => {
           </div>
         </header>
 
-        {/* Main Content Area */}
         <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-visible ${viewMode === 'grid' ? 'py-2 sm:py-3' : 'py-4 sm:py-6'}`}>
-          {/* Search and Filters - Odoo style */}
           <div className="mb-4 sm:mb-6">
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="flex-1 relative">
@@ -439,7 +416,6 @@ const HomePage: React.FC = () => {
               </button>
             </div>
 
-            {/* Tag Filters - Odoo style */}
             <AnimatePresence>
               {showFilters && (
                 <motion.div
@@ -496,7 +472,6 @@ const HomePage: React.FC = () => {
             </AnimatePresence>
           </div>
 
-        {/* Notes Grid/List */}
         {isLoading ? (
           <div className="flex items-center justify-center h-64">
             <motion.div 
@@ -564,7 +539,6 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* API Key Dialog - Odoo style */}
       <AnimatePresence>
         {showApiKeyDialog && (
           <motion.div
@@ -618,7 +592,6 @@ const HomePage: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Lock Password Dialog */}
       {showLockDialog && selectedNoteForLock && (
         <motion.div
           initial={{ opacity: 0 }}

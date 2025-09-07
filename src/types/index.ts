@@ -1,13 +1,12 @@
-// Note types
 export interface Note {
   id: string;
   title: string;
-  content: string; // HTML content from rich text editor
-  plainTextContent?: string; // Plain text version for search
+  content: string;
+  plainTextContent?: string;
   isPinned: boolean;
   isEncrypted: boolean;
-  hasBeenEncrypted: boolean; // Track if note has ever been encrypted
-  encryptedData?: string; // Encrypted content
+  hasBeenEncrypted: boolean;
+  encryptedData?: string;
   tags: string[];
   createdAt: Date;
   updatedAt: Date;
@@ -32,7 +31,7 @@ export interface AIMetadata {
   glossaryTerms?: GlossaryTerm[];
   grammarErrors?: GrammarError[];
   lastAnalyzedAt?: Date;
-  translations?: Record<string, string>; // language code -> translated content
+  translations?: Record<string, string>;
 }
 
 export interface GlossaryTerm {
@@ -50,7 +49,6 @@ export interface GrammarError {
   type: 'spelling' | 'grammar' | 'punctuation';
 }
 
-// Editor types
 export interface EditorCommand {
   id: string;
   name: string;
@@ -75,7 +73,6 @@ export interface EditorState {
   };
 }
 
-// Database types
 export interface DatabaseSchema {
   notes: Note[];
   preferences: UserPreferences;
@@ -89,7 +86,6 @@ export interface UserPreferences {
   groqApiKey?: string;
 }
 
-// Encryption types
 export interface EncryptedNote {
   id: string;
   encryptedContent: string;
@@ -98,7 +94,6 @@ export interface EncryptedNote {
   iv: string;
 }
 
-// API types
 export interface GroqAPIResponse {
   summary?: string;
   tags?: string[];
@@ -107,7 +102,6 @@ export interface GroqAPIResponse {
   translation?: string;
 }
 
-// Search types
 export interface SearchResult {
   note: Note;
   relevance: number;
@@ -118,7 +112,6 @@ export interface SearchResult {
   };
 }
 
-// UI Component Props
 export interface NoteCardProps {
   note: Note;
   onClick: () => void;
@@ -145,7 +138,6 @@ export interface ToolbarButtonProps {
   disabled?: boolean;
 }
 
-// Filter and sort types
 export type SortBy = 'createdAt' | 'updatedAt' | 'title' | 'relevance';
 export type SortOrder = 'asc' | 'desc';
 

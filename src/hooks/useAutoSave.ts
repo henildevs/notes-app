@@ -31,12 +31,10 @@ export const useAutoSave = (options: UseAutoSaveOptions = {}) => {
   const scheduleSave = useCallback((note: Note) => {
     pendingNoteRef.current = note;
     
-    // Clear existing timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
 
-    // Calculate delay based on time since last save
     const timeSinceLastSave = Date.now() - lastSaveRef.current;
     const actualDelay = Math.min(delay, Math.max(100, maxDelay - timeSinceLastSave));
 
@@ -65,7 +63,6 @@ export const useAutoSave = (options: UseAutoSaveOptions = {}) => {
     pendingNoteRef.current = null;
   }, []);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {

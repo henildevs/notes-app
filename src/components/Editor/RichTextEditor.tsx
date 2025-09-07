@@ -46,7 +46,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     const htmlContent = editorRef.current.innerHTML;
     const plainText = editorRef.current.innerText || '';
     
-    // Add to history for undo/redo
     if (htmlContent !== history[historyIndex]) {
       const newHistory = history.slice(0, historyIndex + 1);
       newHistory.push(htmlContent);
@@ -68,34 +67,29 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const handleFormat = useCallback((command: string, value?: string) => {
     if (readOnly) return;
     
-    // Modern approach for color formatting
     if (command === 'foreColor' && value) {
       const selection = window.getSelection();
       if (selection && selection.rangeCount > 0) {
         const range = selection.getRangeAt(0);
         
         if (range.toString()) {
-          // Apply color to selected text
           const span = document.createElement('span');
           span.style.color = value;
           span.textContent = range.toString();
           range.deleteContents();
           range.insertNode(span);
           
-          // Move cursor to end of colored text
           range.setStartAfter(span);
           range.setEndAfter(span);
           selection.removeAllRanges();
           selection.addRange(range);
         } else {
-          // No text selected - set color for future typing
           const span = document.createElement('span');
           span.style.color = value;
-          span.innerHTML = '&nbsp;'; // Non-breaking space to maintain the span
+          span.innerHTML = '&nbsp;';
           
           range.insertNode(span);
           
-          // Move cursor inside the span
           range.setStart(span, 0);
           range.setEnd(span, 0);
           selection.removeAllRanges();
@@ -103,7 +97,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         }
       }
     } else {
-      // Fallback to execCommand for other commands
       document.execCommand(command, false, value);
     }
     
@@ -158,7 +151,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Handle keyboard shortcuts
     if (e.ctrlKey || e.metaKey) {
       switch (e.key) {
         case 'b':
@@ -188,7 +180,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       }
     }
 
-    // Handle Tab for indentation
     if (e.key === 'Tab') {
       e.preventDefault();
       handleFormat(e.shiftKey ? 'outdent' : 'indent');

@@ -36,12 +36,10 @@ const NoteCard: React.FC<NoteCardProps> = ({
 }) => {
   const [showMenu, setShowMenu] = React.useState(false);
 
-  // Format date
   const formatDate = (date: Date) => {
     const d = new Date(date);
     const now = new Date();
     
-    // Reset time to start of day for accurate day comparison
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const noteDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
     
@@ -59,14 +57,12 @@ const NoteCard: React.FC<NoteCardProps> = ({
     });
   };
 
-  // Truncate text for preview
   const truncateText = (text: string, maxLength: number = 120) => {
     if (!text) return '';
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength).trim() + '...';
   };
 
-  // Get preview text
   const getPreviewText = () => {
     if (note.isEncrypted && !note.content) {
       return '🔐 This note is encrypted. Click to unlock.';
@@ -74,7 +70,6 @@ const NoteCard: React.FC<NoteCardProps> = ({
     return truncateText(note.plainTextContent || 'Start writing something amazing...');
   };
 
-  // Get display title
   const getDisplayTitle = () => {
     return note.title || 'Untitled Note';
   };
@@ -103,7 +98,6 @@ const NoteCard: React.FC<NoteCardProps> = ({
         onClick={onClick}
       >
 
-        {/* Status badges - Odoo style */}
         <div className="absolute top-3 sm:top-4 right-10 sm:right-12 flex items-center gap-1 sm:gap-2">
           {note.isPinned && (
             <div className="p-1 bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded">
@@ -117,15 +111,12 @@ const NoteCard: React.FC<NoteCardProps> = ({
           )}
         </div>
 
-        {/* Card Content - Odoo style */}
         <div className="p-3 sm:p-4">
-          {/* Header */}
           <div className="flex items-start justify-between mb-2">
             <h3 className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base line-clamp-1 flex-1 pr-16 sm:pr-20">
               {getDisplayTitle()}
             </h3>
             
-            {/* Menu Button - Odoo style */}
             <div className="relative ml-2">
               <button
                 onClick={(e) => {
@@ -137,7 +128,6 @@ const NoteCard: React.FC<NoteCardProps> = ({
                 <MoreVertical size={16} className="text-gray-500 dark:text-gray-400" />
               </button>
 
-              {/* Dropdown Menu - Odoo style */}
               {showMenu && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
@@ -217,7 +207,6 @@ const NoteCard: React.FC<NoteCardProps> = ({
             </div>
           </div>
 
-          {/* AI Summary - Odoo style */}
           {note.aiMetadata?.summary && (
             <div className="mb-2 p-2 bg-secondary-50 dark:bg-secondary-900/20 rounded border border-secondary-200 dark:border-secondary-800">
               <div className="flex items-start gap-2">
@@ -229,12 +218,10 @@ const NoteCard: React.FC<NoteCardProps> = ({
             </div>
           )}
 
-          {/* Content Preview - Odoo style */}
           <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm line-clamp-2 mb-2 sm:mb-3">
             {getPreviewText()}
           </p>
 
-          {/* Tags - Odoo style */}
           {note.tags.length > 0 && (
             <div className="flex flex-wrap gap-1 sm:gap-1.5 mb-2 sm:mb-3">
               {note.tags.slice(0, 3).map((tag) => (
@@ -254,7 +241,6 @@ const NoteCard: React.FC<NoteCardProps> = ({
             </div>
           )}
 
-          {/* Footer - Odoo style */}
           <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-500">
             <div className="flex items-center gap-3">
               <span>{formatDate(note.updatedAt)}</span>

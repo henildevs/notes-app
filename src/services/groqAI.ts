@@ -5,9 +5,6 @@ class GroqAIService {
   private groq: Groq | null = null;
   private apiKey: string | null = null;
   
-  /**
-   * Initialize Groq with API key
-   */
   initialize(apiKey: string): void {
     if (!apiKey) {
       console.error('Groq API key is required');
@@ -17,20 +14,14 @@ class GroqAIService {
     this.apiKey = apiKey;
     this.groq = new Groq({
       apiKey: apiKey,
-      dangerouslyAllowBrowser: true // Required for browser usage
+      dangerouslyAllowBrowser: true
     });
   }
   
-  /**
-   * Check if service is ready
-   */
   isReady(): boolean {
     return this.groq !== null;
   }
   
-  /**
-   * Generate a summary of the note content
-   */
   async generateSummary(content: string): Promise<string> {
     if (!this.groq) {
       throw new Error('Groq AI service not initialized');
@@ -60,9 +51,6 @@ class GroqAIService {
     }
   }
   
-  /**
-   * Suggest tags based on content
-   */
   async suggestTags(content: string): Promise<string[]> {
     if (!this.groq) {
       throw new Error('Groq AI service not initialized');
@@ -99,9 +87,6 @@ class GroqAIService {
     }
   }
   
-  /**
-   * Find glossary terms in content
-   */
   async findGlossaryTerms(content: string): Promise<GlossaryTerm[]> {
     if (!this.groq) {
       throw new Error('Groq AI service not initialized');
@@ -133,7 +118,6 @@ class GroqAIService {
         const parsed = JSON.parse(responseText);
         const terms = Array.isArray(parsed.terms) ? parsed.terms : (Array.isArray(parsed) ? parsed : []);
         
-        // Find the positions of each term in the content
         const glossaryTerms: GlossaryTerm[] = [];
         const lowerContent = content.toLowerCase();
         
@@ -164,9 +148,6 @@ class GroqAIService {
     }
   }
   
-  /**
-   * Check grammar and spelling
-   */
   async checkGrammar(content: string): Promise<GrammarError[]> {
     if (!this.groq) {
       throw new Error('Groq AI service not initialized');
@@ -197,7 +178,6 @@ class GroqAIService {
         const parsed = JSON.parse(responseText);
         const errors = Array.isArray(parsed.errors) ? parsed.errors : (Array.isArray(parsed) ? parsed : []);
         
-        // Find positions of errors in content
         const grammarErrors: GrammarError[] = [];
         const lowerContent = content.toLowerCase();
         
@@ -229,9 +209,6 @@ class GroqAIService {
     }
   }
   
-  /**
-   * Translate text to another language
-   */
   async translateText(content: string, targetLanguage: string): Promise<string> {
     if (!this.groq) {
       throw new Error('Groq AI service not initialized');
@@ -261,9 +238,6 @@ class GroqAIService {
     }
   }
 
-  /**
-   * Get supported languages for translation
-   */
   getSupportedLanguages(): Array<{code: string, name: string, nativeName: string}> {
     return [
       { code: 'en', name: 'English', nativeName: 'English' },
@@ -287,9 +261,6 @@ class GroqAIService {
     ];
   }
   
-  /**
-   * Get definition for a specific term
-   */
   async getDefinition(term: string): Promise<string> {
     if (!this.groq) {
       throw new Error('Groq AI service not initialized');
@@ -319,9 +290,6 @@ class GroqAIService {
     }
   }
   
-  /**
-   * Improve writing style
-   */
   async improveWriting(content: string): Promise<string> {
     if (!this.groq) {
       throw new Error('Groq AI service not initialized');
@@ -352,5 +320,4 @@ class GroqAIService {
   }
 }
 
-// Export singleton instance
 export const groqAIService = new GroqAIService();

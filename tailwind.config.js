@@ -7,14 +7,13 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Odoo-inspired color palette
         primary: {
           50: '#faf5f9',
           100: '#f5ebf3',
           200: '#e8d4e4',
           300: '#d4adc8',
           400: '#b97ea2',
-          500: '#875A7B', // Main Odoo purple
+          500: '#875A7B', 
           600: '#714b65',
           700: '#5a3c50',
           800: '#4a3242',
@@ -25,7 +24,7 @@ module.exports = {
           100: '#ccf5eb',
           200: '#99ebd7',
           300: '#66e1c3',
-          400: '#44C7A1', // Odoo green
+          400: '#44C7A1', 
           500: '#39a888',
           600: '#2e8a6f',
           700: '#246b56',
@@ -35,7 +34,7 @@ module.exports = {
         gray: {
           50: '#FAFAFA',
           100: '#F5F5F5',
-          200: '#F2F2F2', // Light gray from Odoo
+          200: '#F2F2F2', 
           300: '#E0E0E0',
           400: '#BDBDBD',
           500: '#9E9E9E',

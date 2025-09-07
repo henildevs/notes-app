@@ -8,7 +8,6 @@ class NoteService {
   private autoSaveTimer: NodeJS.Timeout | null = null;
   private pendingSaves = new Map<string, Note>();
 
-  // Create a new note
   async createNote(title: string = 'Untitled Note', content: string = ''): Promise<Note> {
     const now = new Date();
     const note: Note = {
@@ -18,7 +17,7 @@ class NoteService {
       plainTextContent: this.extractPlainText(content),
       isPinned: false,
       isEncrypted: false,
-      hasBeenEncrypted: false, // New notes have never been encrypted
+      hasBeenEncrypted: false,
       tags: [],
       createdAt: now,
       updatedAt: now,
@@ -29,7 +28,6 @@ class NoteService {
     return note;
   }
 
-  // Update an existing note
   async updateNote(id: string, updates: Partial<Note>): Promise<Note | null> {
     const existingNote = await databaseService.getNote(id);
     if (!existingNote) return null;
@@ -45,17 +43,12 @@ class NoteService {
     return updatedNote;
   }
 
-  // Auto-save with debouncing
   autoSaveNote(note: Note, delay: number = 2000): void {
-    // Store pending save
     this.pendingSaves.set(note.id, note);
 
-    // Clear existing timer
     if (this.autoSaveTimer) {
       clearTimeout(this.autoSaveTimer);
     }
-
-    // Set new timer
     this.autoSaveTimer = setTimeout(async () => {
       const pendingNote = this.pendingSaves.get(note.id);
       if (pendingNote) {
@@ -65,32 +58,26 @@ class NoteService {
     }, delay);
   }
 
-  // Delete a note
   async deleteNote(id: string): Promise<void> {
     await databaseService.deleteNote(id);
   }
 
-  // Get all notes
   async getAllNotes(): Promise<Note[]> {
     return await databaseService.getAllNotes();
   }
 
-  // Get a single note
   async getNote(id: string): Promise<Note | null> {
     const note = await databaseService.getNote(id);
     if (note) {
-      // Update last accessed time
       await this.updateNote(id, { lastAccessedAt: new Date() });
     }
     return note;
   }
 
-  // Search notes
   async searchNotes(query: string): Promise<Note[]> {
     return await databaseService.searchNotes(query);
   }
 
-  // Toggle pin status
   async togglePin(id: string): Promise<Note | null> {
     const note = await databaseService.getNote(id);
     if (!note) return null;
@@ -98,7 +85,6 @@ class NoteService {
     return await this.updateNote(id, { isPinned: !note.isPinned });
   }
 
-  // Encrypt a note
   async encryptNote(id: string, password: string): Promise<Note | null> {
     const note = await databaseService.getNote(id);
     if (!note) return null;
@@ -112,10 +98,10 @@ class NoteService {
     const encryptedNote: Note = {
       ...note,
       isEncrypted: true,
-      hasBeenEncrypted: true, // Mark as having been encrypted
+      hasBeenEncrypted: true,
       encryptedData: JSON.stringify({ content: encryptedContent, title: encryptedTitle, salt }),
-      content: '', // Clear unencrypted content
-      title: note.title, // Keep the original title
+      content: '',
+      title: note.title,
       updatedAt: new Date(),
     };
 
@@ -123,7 +109,6 @@ class NoteService {
     return encryptedNote;
   }
 
-  // Decrypt a note
   async decryptNote(id: string, password: string): Promise<Note | null> {
     const note = await databaseService.getNote(id);
     if (!note || !note.isEncrypted || !note.encryptedData) return null;
@@ -137,14 +122,12 @@ class NoteService {
         encryptedData.salt
       );
 
-      // Store password in session for convenience
       encryptionService.storeSessionPassword(id, password);
 
-      // Return decrypted note (not saved to DB)
       return {
         ...note,
-        isEncrypted: false, // Mark as decrypted
-        hasBeenEncrypted: true, // Keep the flag - note has been encrypted before
+        isEncrypted: false,
+        hasBeenEncrypted: true,
         content,
         title,
         plainTextContent: this.extractPlainText(content),
@@ -155,7 +138,6 @@ class NoteService {
     }
   }
 
-  // Check if note can be decrypted with session password
   async tryDecryptWithSession(id: string): Promise<Note | null> {
     const sessionPassword = encryptionService.getSessionPassword(id);
     if (!sessionPassword) return null;
@@ -168,7 +150,6 @@ class NoteService {
     }
   }
 
-  // Generate AI summary for a note
   async generateSummary(id: string): Promise<string | null> {
     const note = await databaseService.getNote(id);
     if (!note || !note.content) return null;
@@ -188,7 +169,6 @@ class NoteService {
     }
   }
 
-  // Generate AI tag suggestions
   async generateTagSuggestions(id: string): Promise<string[]> {
     const note = await databaseService.getNote(id);
     if (!note || !note.content) return [];
@@ -208,7 +188,6 @@ class NoteService {
     }
   }
 
-  // Find glossary terms in note
   async findGlossaryTerms(id: string): Promise<void> {
     const note = await databaseService.getNote(id);
     if (!note || !note.content) return;
@@ -226,7 +205,6 @@ class NoteService {
     }
   }
 
-  // Check grammar in note
   async checkGrammar(id: string): Promise<void> {
     const note = await databaseService.getNote(id);
     if (!note || !note.content) return;
@@ -244,7 +222,6 @@ class NoteService {
     }
   }
 
-  // Translate note content
   async translateNote(id: string, targetLanguage: string): Promise<string | null> {
     const note = await databaseService.getNote(id);
     if (!note || !note.content) return null;
@@ -252,7 +229,6 @@ class NoteService {
     try {
       const translatedContent = await groqAIService.translateText(note.content, targetLanguage);
       
-      // Store translation in AI metadata
       await this.updateNote(id, {
         aiMetadata: {
           ...note.aiMetadata,
@@ -270,7 +246,6 @@ class NoteService {
     }
   }
 
-  // Get cached translation
   async getCachedTranslation(id: string, targetLanguage: string): Promise<string | null> {
     const note = await databaseService.getNote(id);
     if (!note || !note.aiMetadata?.translations) return null;
@@ -278,16 +253,14 @@ class NoteService {
     return note.aiMetadata.translations[targetLanguage] || null;
   }
 
-  // Add tag to note
   async addTag(id: string, tag: string): Promise<Note | null> {
     const note = await databaseService.getNote(id);
     if (!note) return null;
 
-    const tags = Array.from(new Set([...note.tags, tag])); // Ensure unique tags
+    const tags = Array.from(new Set([...note.tags, tag]));
     return await this.updateNote(id, { tags });
   }
 
-  // Remove tag from note
   async removeTag(id: string, tag: string): Promise<Note | null> {
     const note = await databaseService.getNote(id);
     if (!note) return null;
@@ -296,29 +269,24 @@ class NoteService {
     return await this.updateNote(id, { tags });
   }
 
-  // Bulk delete notes
   async bulkDelete(ids: string[]): Promise<void> {
     await databaseService.bulkDelete(ids);
   }
 
-  // Export notes
   async exportNotes(): Promise<string> {
     return await databaseService.exportNotes();
   }
 
-  // Import notes
   async importNotes(jsonData: string): Promise<void> {
     await databaseService.importNotes(jsonData);
   }
 
-  // Extract plain text from HTML
   private extractPlainText(html: string): string {
     const temp = document.createElement('div');
     temp.innerHTML = html;
     return temp.textContent || temp.innerText || '';
   }
 
-  // Get statistics
   async getStatistics(): Promise<{
     totalNotes: number;
     pinnedNotes: number;
@@ -339,9 +307,6 @@ class NoteService {
     };
   }
 
-  // Version History Methods
-  
-  // Create a new version of a note
   async createVersion(noteId: string, content: string, title: string): Promise<NoteVersion | null> {
     const note = await databaseService.getNote(noteId);
     if (!note) return null;
@@ -356,7 +321,6 @@ class NoteService {
       versionNumber,
     };
 
-    // Update note with new version number and add version to versions array
     const updatedNote: Note = {
       ...note,
       version: versionNumber,
@@ -367,19 +331,16 @@ class NoteService {
     return version;
   }
 
-  // Get all versions for a note
   async getNoteVersions(noteId: string): Promise<NoteVersion[]> {
     const note = await databaseService.getNote(noteId);
     return note?.versions || [];
   }
 
-  // Get a specific version
   async getVersion(noteId: string, versionId: string): Promise<NoteVersion | null> {
     const versions = await this.getNoteVersions(noteId);
     return versions.find(v => v.id === versionId) || null;
   }
 
-  // Restore a note to a specific version
   async restoreToVersion(noteId: string, versionId: string): Promise<Note | null> {
     const version = await this.getVersion(noteId, versionId);
     if (!version) return null;
@@ -399,7 +360,6 @@ class NoteService {
     return restoredNote;
   }
 
-  // Delete a specific version
   async deleteVersion(noteId: string, versionId: string): Promise<boolean> {
     const note = await databaseService.getNote(noteId);
     if (!note || !note.versions) return false;
@@ -414,7 +374,6 @@ class NoteService {
     return true;
   }
 
-  // Clear all versions for a note
   async clearVersions(noteId: string): Promise<boolean> {
     const note = await databaseService.getNote(noteId);
     if (!note) return false;
@@ -429,12 +388,10 @@ class NoteService {
     return true;
   }
 
-  // Update note with automatic version creation
   async updateNoteWithVersion(id: string, updates: Partial<Note>): Promise<Note | null> {
     const existingNote = await databaseService.getNote(id);
     if (!existingNote) return null;
 
-    // Only create version if content or title changed significantly
     const shouldCreateVersion = 
       (updates.content && updates.content !== existingNote.content) ||
       (updates.title && updates.title !== existingNote.title);
@@ -443,11 +400,9 @@ class NoteService {
       await this.createVersion(id, existingNote.content, existingNote.title);
     }
 
-    // Update the note
     return this.updateNote(id, updates);
   }
 
 }
 
-// Export singleton instance
 export const noteService = new NoteService();

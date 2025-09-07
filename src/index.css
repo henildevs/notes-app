@@ -28,47 +28,43 @@
 }
 
 @layer components {
-  /* Odoo-style card effect */
-  .odoo-card {
+  .modern-card {
     @apply bg-white rounded-lg shadow-sm border border-gray-100;
     @apply hover:shadow-md transition-shadow duration-200;
   }
   
-  .odoo-card-dark {
+  .modern-card-dark {
     @apply bg-dark-surface rounded-lg shadow-sm border border-gray-800;
     @apply hover:shadow-md transition-shadow duration-200;
   }
   
-  /* Odoo-style button */
-  .btn-odoo {
+  .btn-primary {
     @apply px-5 py-2.5 bg-primary-500 text-white;
     @apply rounded-md font-medium;
     @apply hover:bg-primary-600 transition-colors duration-200;
     @apply active:bg-primary-700;
   }
   
-  .btn-odoo-secondary {
+  .btn-secondary {
     @apply px-5 py-2.5 bg-white text-gray-700 border border-gray-300;
     @apply rounded-md font-medium;
     @apply hover:bg-gray-50 transition-colors duration-200;
     @apply active:bg-gray-100;
   }
   
-  /* Odoo-style text */
-  .text-odoo-primary {
+  .text-primary-accent {
     @apply text-primary-500;
   }
   
-  .text-odoo-secondary {
+  .text-secondary-accent {
     @apply text-secondary-400;
   }
   
-  .heading-odoo {
+  .heading-primary {
     @apply text-gray-900 dark:text-gray-100 font-bold;
   }
   
-  /* Odoo card hover effects */
-  .odoo-hover {
+  .smooth-hover {
     @apply transition-all duration-200;
     @apply hover:shadow-lg hover:border-primary-200;
   }

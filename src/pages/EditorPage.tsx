@@ -48,7 +48,6 @@ const EditorPage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showVersionHistory, setShowVersionHistory] = useState(false);
 
-  // Initialize theme and AI service on mount
   const loadTheme = async () => {
     const prefs = await databaseService.getPreferences();
     if (prefs.theme === 'dark' || (prefs.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -63,7 +62,6 @@ const EditorPage: React.FC = () => {
     if (prefs.groqApiKey) {
       groqAIService.initialize(prefs.groqApiKey);
     } else {
-      // Show popup to enable AI features
       setShowNoApiKeyDialog(true);
     }
   };
@@ -100,7 +98,6 @@ const EditorPage: React.FC = () => {
     try {
       const loadedNote = await noteService.getNote(id);
       if (loadedNote) {
-        // Try to decrypt if encrypted
         if (loadedNote.isEncrypted) {
           const decrypted = await noteService.tryDecryptWithSession(id);
           setNote(decrypted || loadedNote);
@@ -108,7 +105,6 @@ const EditorPage: React.FC = () => {
           setNote(loadedNote);
         }
       } else {
-        // Note not found, redirect to home
         navigate('/');
       }
     } catch (error) {
@@ -123,7 +119,6 @@ const EditorPage: React.FC = () => {
     try {
       const newNote = await noteService.createNote('Untitled Note', '');
       setNote(newNote);
-      // Update URL to include the new note ID
       navigate(`/editor/${newNote.id}`, { replace: true });
     } catch (error) {
       console.error('Failed to create note:', error);
@@ -133,12 +128,10 @@ const EditorPage: React.FC = () => {
     }
   }, [navigate]);
 
-  // Load note on mount
   useEffect(() => {
     if (id) {
       loadNote();
     } else {
-      // Create new note
       createNewNote();
     }
   }, [id, loadNote, createNewNote]);
@@ -146,7 +139,6 @@ const EditorPage: React.FC = () => {
   const handleLockNote = async () => {
     if (!note || !lockPassword.trim()) return;
     
-    // Check password confirmation
     if (lockPassword !== confirmPassword) {
       alert('Passwords do not match. Please try again.');
       return;

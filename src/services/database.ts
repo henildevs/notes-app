@@ -27,7 +27,6 @@ class DatabaseService {
     try {
       await this.db.open();
       
-      // Initialize default preferences if not exists
       const prefs = await this.db.preferences.get('default');
       if (!prefs) {
         await this.db.preferences.add({
@@ -43,11 +42,9 @@ class DatabaseService {
     }
   }
 
-  // Notes operations
   async getAllNotes(): Promise<Note[]> {
     try {
       const notes = await this.db.notes.toArray();
-      // Sort by pinned first, then by updated date
       return notes.sort((a, b) => {
         if (a.isPinned && !b.isPinned) return -1;
         if (!a.isPinned && b.isPinned) return 1;
@@ -151,7 +148,6 @@ class DatabaseService {
     }
   }
 
-  // Preferences operations
   async getPreferences(): Promise<UserPreferences> {
     try {
       const prefs = await this.db.preferences.get('default');
@@ -186,7 +182,6 @@ class DatabaseService {
     }
   }
 
-  // Export/Import operations
   async exportNotes(): Promise<string> {
     try {
       const notes = await this.getAllNotes();
@@ -214,12 +209,9 @@ class DatabaseService {
         throw new Error('Invalid import data format');
       }
       
-      // Clear existing notes (optional - could merge instead)
       await this.db.notes.clear();
       
-      // Import notes
       for (const note of data.notes) {
-        // Ensure dates are Date objects
         note.createdAt = new Date(note.createdAt);
         note.updatedAt = new Date(note.updatedAt);
         if (note.lastAccessedAt) {
@@ -229,7 +221,6 @@ class DatabaseService {
         await this.db.notes.add(note);
       }
       
-      // Import preferences if present
       if (data.preferences) {
         await this.savePreferences(data.preferences);
       }
@@ -239,7 +230,6 @@ class DatabaseService {
     }
   }
 
-  // Statistics
   async getStatistics() {
     try {
       const notes = await this.getAllNotes();
@@ -270,12 +260,11 @@ class DatabaseService {
     }
   }
 
-  // Clear all data
   async clearAllData(): Promise<void> {
     try {
       await this.db.notes.clear();
       await this.db.preferences.clear();
-      await this.initializeDatabase(); // Re-initialize with defaults
+      await this.initializeDatabase();
     } catch (error) {
       console.error('Failed to clear all data:', error);
       throw error;
@@ -283,5 +272,4 @@ class DatabaseService {
   }
 }
 
-// Export singleton instance
 export const databaseService = new DatabaseService();

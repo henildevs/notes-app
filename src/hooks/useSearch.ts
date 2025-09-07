@@ -23,7 +23,6 @@ export const useSearch = (
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Debounce the search query
   useEffect(() => {
     setIsLoading(true);
     const timer = setTimeout(() => {
@@ -37,7 +36,6 @@ export const useSearch = (
     };
   }, [query, debounceMs]);
 
-  // Memoized search results
   const searchResults = useMemo(() => {
     if (!debouncedQuery || debouncedQuery.length < minQueryLength) {
       return notes;
@@ -46,17 +44,14 @@ export const useSearch = (
     const searchTerm = debouncedQuery.toLowerCase();
     
     return notes.filter(note => {
-      // Search in title
       if (note.title.toLowerCase().includes(searchTerm)) {
         return true;
       }
 
-      // Search in content (plain text)
       if (note.plainTextContent?.toLowerCase().includes(searchTerm)) {
         return true;
       }
 
-      // Search in tags
       if (note.tags.some(tag => tag.toLowerCase().includes(searchTerm))) {
         return true;
       }
