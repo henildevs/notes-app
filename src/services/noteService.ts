@@ -52,7 +52,7 @@ class NoteService {
     this.autoSaveTimer = setTimeout(async () => {
       const pendingNote = this.pendingSaves.get(note.id);
       if (pendingNote) {
-        await this.updateNote(pendingNote.id, pendingNote);
+        await this.updateNoteWithVersion(pendingNote.id, pendingNote);
         this.pendingSaves.delete(note.id);
       }
     }, delay);

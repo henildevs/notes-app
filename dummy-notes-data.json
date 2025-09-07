@@ -9,6 +9,11 @@
       "isEncrypted": false,
       "hasBeenEncrypted": false,
       "tags": ["welcome", "getting-started", "tutorial"],
+      "aiMetadata": {
+        "summary": "Welcome note introducing the rich text editor features including formatting, lists, tags, and guidance on creating the first note.",
+        "suggestedTags": ["welcome", "tutorial", "editor", "getting-started"],
+        "glossaryTerms": ["rich text editor", "formatting", "tags"]
+      },
       "createdAt": "2024-01-15T10:30:00.000Z",
       "updatedAt": "2024-01-15T10:30:00.000Z",
       "lastAccessedAt": "2024-01-20T14:22:00.000Z"
@@ -22,6 +27,30 @@
       "isEncrypted": false,
       "hasBeenEncrypted": false,
       "tags": ["projects", "ideas", "brainstorming", "development"],
+      "aiMetadata": {
+        "summary": "Collection of four innovative project ideas including AI recipe generator, finance tracker, habit tracker, and weather dashboard, with actionable next steps for development.",
+        "suggestedTags": ["projects", "ai", "fintech", "productivity", "weather"],
+        "glossaryTerms": ["MVP", "wireframes", "market demand", "development environment"]
+      },
+      "version": 3,
+      "versions": [
+        {
+          "id": "version-002-001",
+          "noteId": "note-002",
+          "content": "<h3>🚀 Project Ideas</h3><p>Here are some project ideas to explore:</p><ol><li><strong>AI Recipe Generator</strong> - Create recipes based on ingredients</li><li><strong>Personal Finance Tracker</strong> - Track expenses</li></ol>",
+          "title": "Project Ideas",
+          "timestamp": "2024-01-14T09:15:00.000Z",
+          "versionNumber": 1
+        },
+        {
+          "id": "version-002-002",
+          "noteId": "note-002",
+          "content": "<h3>🚀 Project Ideas</h3><p>Here are some exciting project ideas to explore:</p><ol><li><strong>AI-Powered Recipe Generator</strong> - Create recipes based on available ingredients</li><li><strong>Personal Finance Tracker</strong> - Track expenses and investments</li><li><strong>Habit Tracker App</strong> - Build better habits</li></ol>",
+          "title": "Project Ideas & Brainstorming",
+          "timestamp": "2024-01-16T14:20:00.000Z",
+          "versionNumber": 2
+        }
+      ],
       "createdAt": "2024-01-14T09:15:00.000Z",
       "updatedAt": "2024-01-18T16:45:00.000Z",
       "lastAccessedAt": "2024-01-18T16:45:00.000Z"
@@ -48,6 +77,11 @@
       "isEncrypted": false,
       "hasBeenEncrypted": false,
       "tags": ["learning", "react", "typescript", "resources", "development"],
+      "aiMetadata": {
+        "summary": "Comprehensive learning resource compilation for React and TypeScript, featuring books, video courses, and essential documentation links.",
+        "suggestedTags": ["react", "typescript", "learning", "frontend", "documentation"],
+        "glossaryTerms": ["React", "TypeScript", "Frontend Masters", "cheatsheet"]
+      },
       "createdAt": "2024-01-12T14:20:00.000Z",
       "updatedAt": "2024-01-12T14:20:00.000Z",
       "lastAccessedAt": "2024-01-19T11:30:00.000Z"
@@ -61,6 +95,11 @@
       "isEncrypted": false,
       "hasBeenEncrypted": false,
       "tags": ["goals", "2024", "personal", "planning", "life"],
+      "aiMetadata": {
+        "summary": "2024 personal goals organized into health & fitness, career & learning, and personal development categories with specific, measurable objectives.",
+        "suggestedTags": ["goals", "fitness", "career", "learning", "personal-development"],
+        "glossaryTerms": ["5K run", "programming language", "side projects", "tech conferences"]
+      },
       "createdAt": "2024-01-01T00:00:00.000Z",
       "updatedAt": "2024-01-15T20:30:00.000Z",
       "lastAccessedAt": "2024-01-15T20:30:00.000Z"
@@ -81,12 +120,12 @@
     {
       "id": "note-007",
       "title": "🔒 Secret Project Ideas",
-      "content": "<h2>Top Secret Project Ideas</h2><p>This note contains confidential project ideas that should be kept private.</p><h3>Revolutionary App Concepts:</h3><ul><li>AI-powered personal assistant</li><li>Blockchain-based voting system</li><li>AR shopping experience</li><li>Voice-controlled smart home</li></ul><h3>Market Research:</h3><p>Target audience: Tech-savvy millennials and Gen Z</p><p>Competition analysis: Limited direct competitors</p><p>Revenue model: Freemium with premium features</p>",
-      "plainTextContent": "Top Secret Project Ideas. This note contains confidential project ideas that should be kept private. Revolutionary App Concepts: AI-powered personal assistant, Blockchain-based voting system, AR shopping experience, Voice-controlled smart home. Market Research: Target audience tech-savvy millennials and Gen Z, Limited direct competitors, Freemium revenue model.",
+      "content": "",
+      "plainTextContent": "",
       "isPinned": false,
       "isEncrypted": true,
       "hasBeenEncrypted": true,
-      "encryptedData": "{\"content\":\"encrypted-content-placeholder\",\"title\":\"encrypted-title-placeholder\",\"salt\":\"sample-salt\"}",
+      "encryptedData": "{\"content\":\"U2FsdGVkX1+5qPzVq5Kf8ym2n5XzR8J9vCm8QGnY7BkL8WwFzN6tCQs4HdRmNw3vT1u6PzK2YjHg8QzF5Nw7XdCm3vBn9TrE2Qm8LzF7Yn6s\",\"title\":\"U2FsdGVkX1+8tKmZ3vHs6yN2m4XwR9J8uDn7QHnY8CkM9XxGzO5uCRt5IdSnOx2wU2v7QzL3ZkIh9R0G6Ox8YeCn4wCo0UsF3Rn9MzG8Zo7t\",\"salt\":\"a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6\"}",
       "tags": ["secret", "projects", "confidential", "business"],
       "createdAt": "2024-01-11T16:30:00.000Z",
       "updatedAt": "2024-01-11T16:30:00.000Z",
@@ -114,6 +153,22 @@
       "isEncrypted": false,
       "hasBeenEncrypted": false,
       "tags": ["books", "habits", "self-improvement", "productivity", "notes"],
+      "aiMetadata": {
+        "summary": "Key concepts from Atomic Habits including habit loops, identity-based habits, environment design, and practical applications for building better systems.",
+        "suggestedTags": ["atomic-habits", "behavior", "systems", "identity", "environment"],
+        "glossaryTerms": ["habit loop", "habit stacking", "identity-based habits", "environment design"]
+      },
+      "version": 2,
+      "versions": [
+        {
+          "id": "version-009-001",
+          "noteId": "note-009",
+          "content": "<h2>📖 Atomic Habits - Book Notes</h2><h3>Key Concepts:</h3><ul><li><strong>Habit Loop:</strong> Cue → Craving → Response → Reward</li><li><strong>Identity-Based Habits:</strong> Focus on who you want to become</li></ul>",
+          "title": "Book Notes - Atomic Habits",
+          "timestamp": "2024-01-10T19:30:00.000Z",
+          "versionNumber": 1
+        }
+      ],
       "createdAt": "2024-01-10T19:30:00.000Z",
       "updatedAt": "2024-01-10T19:30:00.000Z",
       "lastAccessedAt": "2024-01-10T19:30:00.000Z"
@@ -127,6 +182,11 @@
       "isEncrypted": false,
       "hasBeenEncrypted": false,
       "tags": ["css", "flexbox", "reference", "frontend", "web-development"],
+      "aiMetadata": {
+        "summary": "Quick reference guide for CSS Flexbox covering container properties (display, direction, justify-content) and item properties (flex, grow, shrink, basis).",
+        "suggestedTags": ["css", "flexbox", "layout", "alignment", "responsive"],
+        "glossaryTerms": ["flex container", "main axis", "cross axis", "flex-grow", "flex-shrink"]
+      },
       "createdAt": "2024-01-17T08:45:00.000Z",
       "updatedAt": "2024-01-17T08:45:00.000Z",
       "lastAccessedAt": "2024-01-17T08:45:00.000Z"
@@ -186,12 +246,12 @@
     {
       "id": "note-015",
       "title": "🔒 Personal Diary Entry",
-      "content": "<h2>Personal Thoughts - January 19, 2024</h2><p>Today was a challenging day. I felt overwhelmed with work and personal responsibilities. Sometimes it's hard to find balance.</p><p>I'm grateful for the small moments of joy - a good cup of coffee, a text from a friend, watching the sunset from my window.</p><p>Tomorrow is a new day, and I'm determined to approach it with a positive mindset.</p>",
-      "plainTextContent": "Personal Thoughts - January 19, 2024. Today was a challenging day. I felt overwhelmed with work and personal responsibilities. Sometimes it's hard to find balance. I'm grateful for the small moments of joy - a good cup of coffee, a text from a friend, watching the sunset from my window.",
+      "content": "",
+      "plainTextContent": "",
       "isPinned": false,
       "isEncrypted": true,
       "hasBeenEncrypted": true,
-      "encryptedData": "{\"content\":\"encrypted-content-placeholder\",\"title\":\"encrypted-title-placeholder\",\"salt\":\"sample-salt\"}",
+      "encryptedData": "{\"content\":\"U2FsdGVkX1+7sLmY4vIt7zO3m5YxS0K9wEo8RIoZ9DlO0YyHzP6vDSu6JeToP y3xV3w8RzM4akJi0S1H7Py9ZfDo5xDp1VtG4So0NzH9ap8u\",\"title\":\"U2FsdGVkX1+9uMnZ5wJu8zP4n6ZySaL0xFp9SJpaoElP1ZzI0Q7wETv7KfUpQj4yW4x9S0N5blKj1T2I8Qz0ZgEp6yEq2WuH5Tp1O0I0bq9v\",\"salt\":\"b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7\"}",
       "tags": ["diary", "personal", "private", "thoughts"],
       "createdAt": "2024-01-19T23:30:00.000Z",
       "updatedAt": "2024-01-19T23:30:00.000Z",
@@ -206,6 +266,38 @@
       "isEncrypted": false,
       "hasBeenEncrypted": false,
       "tags": ["javascript", "code", "snippets", "programming", "reference"],
+      "aiMetadata": {
+        "summary": "Collection of useful JavaScript code snippets covering array methods for filtering, finding, and grouping, plus async/await patterns with error handling.",
+        "suggestedTags": ["javascript", "arrays", "async-await", "error-handling", "functional"],
+        "glossaryTerms": ["Set", "reduce", "async/await", "fetch API", "destructuring"]
+      },
+      "version": 4,
+      "versions": [
+        {
+          "id": "version-016-001",
+          "noteId": "note-016",
+          "content": "<h2>💻 JavaScript Code Snippets</h2><h3>Array Methods:</h3><pre><code>// Filter unique values\nconst unique = [...new Set(array)];</code></pre>",
+          "title": "Code Snippets - JavaScript",
+          "timestamp": "2024-01-16T14:45:00.000Z",
+          "versionNumber": 1
+        },
+        {
+          "id": "version-016-002",
+          "noteId": "note-016",
+          "content": "<h2>💻 JavaScript Code Snippets</h2><h3>Array Methods:</h3><pre><code>// Filter unique values\nconst unique = [...new Set(array)];\n\n// Find object in array\nconst user = users.find(u => u.id === userId);</code></pre>",
+          "title": "Code Snippets - JavaScript",
+          "timestamp": "2024-01-16T15:30:00.000Z",
+          "versionNumber": 2
+        },
+        {
+          "id": "version-016-003",
+          "noteId": "note-016",
+          "content": "<h2>💻 Useful JavaScript Code Snippets</h2><h3>Array Methods:</h3><pre><code>// Filter unique values\nconst unique = [...new Set(array)];\n\n// Find object in array\nconst user = users.find(u => u.id === userId);\n\n// Group by property\nconst grouped = array.reduce((acc, item) => {\n  const key = item.category;\n  acc[key] = acc[key] || [];\n  acc[key].push(item);\n  return acc;\n}, {});</code></pre>",
+          "title": "Code Snippets - JavaScript",
+          "timestamp": "2024-01-16T16:15:00.000Z",
+          "versionNumber": 3
+        }
+      ],
       "createdAt": "2024-01-16T14:45:00.000Z",
       "updatedAt": "2024-01-16T14:45:00.000Z",
       "lastAccessedAt": "2024-01-16T14:45:00.000Z"
@@ -252,12 +344,12 @@
     {
       "id": "note-020",
       "title": "🔒 Financial Information",
-      "content": "<h2>Financial Information</h2><p>This note contains sensitive financial information including account numbers, passwords, and investment details.</p><p>Bank Account: ****1234</p><p>Investment Portfolio: Tech stocks, Index funds, Bonds</p><p>Credit Card: ****5678</p><p>Emergency Fund: $15,000</p>",
-      "plainTextContent": "Financial Information. This note contains sensitive financial information including account numbers, passwords, and investment details. Bank Account details, Investment Portfolio information, Credit Card details, Emergency Fund amount.",
+      "content": "",
+      "plainTextContent": "",
       "isPinned": false,
       "isEncrypted": true,
       "hasBeenEncrypted": true,
-      "encryptedData": "{\"content\":\"encrypted-content-placeholder\",\"title\":\"encrypted-title-placeholder\",\"salt\":\"sample-salt\"}",
+      "encryptedData": "{\"content\":\"U2FsdGVkX1+8tLnZ5wKv9zQ5n7ZzTbM1xGq0TKqbpFmQ2a0JaR8xFUw8LgVqRk5zX5y0TaN6cmLk2U3J9R0aZhFq7zFr3XwI6Uq2P1J1cr0w\",\"title\":\"U2FsdGVkX1+0sLmX3vHr6yM2m4WvR8J7tDm6PGmY7CkL8WwFzN5tCQs3HdRmNw2vT1u5PzK1YjHg7QzF4Nw6XdCm2vBm8TrE1Qm7LzF6Yn5r\",\"salt\":\"c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8\"}",
       "tags": ["finance", "banking", "investments", "private"],
       "createdAt": "2024-01-14T11:20:00.000Z",
       "updatedAt": "2024-01-14T11:20:00.000Z",
