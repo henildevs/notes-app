@@ -48,7 +48,7 @@ class GroqAIService {
             content: `Please summarize the following text in 1-2 lines:\n\n${content}`
           }
         ],
-        model: 'mixtral-8x7b-32768',
+        model: 'llama-3.1-8b-instant',
         temperature: 0.3,
         max_tokens: 100,
       });
@@ -80,7 +80,7 @@ class GroqAIService {
             content: `Suggest 3-5 relevant tags for the following text:\n\n${content}`
           }
         ],
-        model: 'mixtral-8x7b-32768',
+        model: 'llama-3.1-8b-instant',
         temperature: 0.5,
         max_tokens: 50,
       });
@@ -121,7 +121,7 @@ class GroqAIService {
             content: `Identify key terms that need definitions in this text:\n\n${content}`
           }
         ],
-        model: 'mixtral-8x7b-32768',
+        model: 'llama-3.1-8b-instant',
         temperature: 0.3,
         max_tokens: 500,
         response_format: { type: 'json_object' },
@@ -186,7 +186,7 @@ class GroqAIService {
             content: `Check for grammar and spelling errors in this text:\n\n${content}`
           }
         ],
-        model: 'mixtral-8x7b-32768',
+        model: 'llama-3.1-8b-instant',
         temperature: 0.2,
         max_tokens: 500,
         response_format: { type: 'json_object' },
@@ -250,7 +250,7 @@ class GroqAIService {
             content: `Translate the following text to ${targetLanguage}:\n\n${content}`
           }
         ],
-        model: 'mixtral-8x7b-32768',
+        model: 'llama-3.1-8b-instant',
         temperature: 0.3,
         max_tokens: 2000,
       });
@@ -282,7 +282,7 @@ class GroqAIService {
             content: `Define: ${term}`
           }
         ],
-        model: 'mixtral-8x7b-32768',
+        model: 'llama-3.1-8b-instant',
         temperature: 0.3,
         max_tokens: 100,
       });
@@ -314,7 +314,7 @@ class GroqAIService {
             content: `Please improve the following text:\n\n${content}`
           }
         ],
-        model: 'mixtral-8x7b-32768',
+        model: 'llama-3.1-8b-instant',
         temperature: 0.4,
         max_tokens: 2000,
       });

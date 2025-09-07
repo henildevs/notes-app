@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -15,7 +15,6 @@ import {
   Tag,
   Moon,
   Sun,
-  Settings,
   Key,
   Zap,
   TrendingUp
@@ -55,6 +54,29 @@ const HomePage: React.FC = () => {
 
   // Filter notes when search or filters change
   useEffect(() => {
+    const filterNotes = () => {
+      let filtered = [...notes];
+
+      // Search filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        filtered = filtered.filter(note =>
+          note.title.toLowerCase().includes(query) ||
+          note.plainTextContent?.toLowerCase().includes(query) ||
+          note.tags.some(tag => tag.toLowerCase().includes(query))
+        );
+      }
+
+      // Tag filter
+      if (selectedTags.length > 0) {
+        filtered = filtered.filter(note =>
+          selectedTags.every(tag => note.tags.includes(tag))
+        );
+      }
+
+      setFilteredNotes(filtered);
+    };
+    
     filterNotes();
   }, [searchQuery, selectedTags, notes]);
 
@@ -104,28 +126,6 @@ const HomePage: React.FC = () => {
     }
   };
 
-  const filterNotes = () => {
-    let filtered = [...notes];
-
-    // Search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(note =>
-        note.title.toLowerCase().includes(query) ||
-        note.plainTextContent?.toLowerCase().includes(query) ||
-        note.tags.some(tag => tag.toLowerCase().includes(query))
-      );
-    }
-
-    // Tag filter
-    if (selectedTags.length > 0) {
-      filtered = filtered.filter(note =>
-        selectedTags.every(tag => note.tags.includes(tag))
-      );
-    }
-
-    setFilteredNotes(filtered);
-  };
 
   const handleCreateNote = async () => {
     try {
@@ -519,29 +519,26 @@ const HomePage: React.FC = () => {
             )}
           </motion.div>
         ) : (
-          <motion.div
-            layout
+          <div
             className={
               viewMode === 'grid'
                 ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
                 : 'space-y-4'
             }
           >
-            <AnimatePresence mode="popLayout">
-              {filteredNotes.map((note, index) => (
-                <NoteCard
-                  key={note.id}
-                  note={note}
-                  index={index}
-                  onClick={() => navigate(`/editor/${note.id}`)}
-                  onEdit={() => navigate(`/editor/${note.id}`)}
-                  onDelete={() => handleDeleteNote(note.id)}
-                  onTogglePin={() => handleTogglePin(note.id)}
-                  onToggleEncrypt={() => handleToggleEncrypt(note.id)}
-                />
-              ))}
-            </AnimatePresence>
-          </motion.div>
+            {filteredNotes.map((note, index) => (
+              <NoteCard
+                key={note.id}
+                note={note}
+                index={index}
+                onClick={() => navigate(`/editor/${note.id}`)}
+                onEdit={() => navigate(`/editor/${note.id}`)}
+                onDelete={() => handleDeleteNote(note.id)}
+                onTogglePin={() => handleTogglePin(note.id)}
+                onToggleEncrypt={() => handleToggleEncrypt(note.id)}
+              />
+            ))}
+          </div>
         )}
       </div>
 
