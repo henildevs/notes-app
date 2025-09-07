@@ -409,7 +409,7 @@ const EditorPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative overflow-visible">
       {/* Animated Background */}
       <div className="fixed inset-0 bg-gradient-mesh opacity-5 dark:opacity-[0.02] animate-gradient" />
       <div className="fixed inset-0 bg-gradient-to-br from-primary-500/5 via-transparent to-secondary/5" />
@@ -512,8 +512,8 @@ const EditorPage: React.FC = () => {
           </div>
         </motion.div>
 
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="max-w-7xl mx-auto px-4 py-4 sm:py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
             {/* Main Editor */}
             <motion.div 
               className="lg:col-span-2"
@@ -521,7 +521,7 @@ const EditorPage: React.FC = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <div className="glass dark:glass-dark rounded-2xl shadow-xl border border-white/20 dark:border-white/10 overflow-hidden">
+              <div className="glass dark:glass-dark rounded-2xl shadow-xl border border-white/20 dark:border-white/10 overflow-visible">
                 {/* Encrypted Note Unlock Interface */}
                 {note.isEncrypted && !note.content && (
                   <div className="p-8 text-center">

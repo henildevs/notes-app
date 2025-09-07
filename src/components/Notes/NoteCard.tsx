@@ -104,7 +104,7 @@ const NoteCard: React.FC<NoteCardProps> = ({
       >
 
         {/* Status badges - Odoo style */}
-        <div className="absolute top-4 right-12 flex items-center gap-2">
+        <div className="absolute top-3 sm:top-4 right-10 sm:right-12 flex items-center gap-1 sm:gap-2">
           {note.isPinned && (
             <div className="p-1 bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded">
               <Pin size={14} className="fill-current" />
@@ -118,10 +118,10 @@ const NoteCard: React.FC<NoteCardProps> = ({
         </div>
 
         {/* Card Content - Odoo style */}
-        <div className="p-4">
+        <div className="p-3 sm:p-4">
           {/* Header */}
           <div className="flex items-start justify-between mb-2">
-            <h3 className="font-semibold text-gray-900 dark:text-white text-base line-clamp-1 flex-1 pr-20">
+            <h3 className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base line-clamp-1 flex-1 pr-16 sm:pr-20">
               {getDisplayTitle()}
             </h3>
             
@@ -230,24 +230,24 @@ const NoteCard: React.FC<NoteCardProps> = ({
           )}
 
           {/* Content Preview - Odoo style */}
-          <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 mb-3">
+          <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm line-clamp-2 mb-2 sm:mb-3">
             {getPreviewText()}
           </p>
 
           {/* Tags - Odoo style */}
           {note.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mb-3">
+            <div className="flex flex-wrap gap-1 sm:gap-1.5 mb-2 sm:mb-3">
               {note.tags.slice(0, 3).map((tag) => (
                 <span
                   key={tag}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded text-xs"
+                  className="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded text-xs"
                 >
-                  <Tag size={10} />
+                  <Tag size={8} className="sm:w-2.5 sm:h-2.5" />
                   {tag}
                 </span>
               ))}
               {note.tags.length > 3 && (
-                <span className="px-2 py-0.5 text-gray-500 dark:text-gray-500 text-xs">
+                <span className="px-1.5 sm:px-2 py-0.5 text-gray-500 dark:text-gray-500 text-xs">
                   +{note.tags.length - 3}
                 </span>
               )}

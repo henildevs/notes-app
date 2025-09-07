@@ -221,7 +221,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       type="button"
     >
       <Icon size={18} />
-      <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+      <span className="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-[100]">
         {tooltip}
       </span>
     </motion.button>
@@ -233,24 +233,24 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         <motion.div 
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="editor-toolbar sticky top-0 z-40 overflow-visible"
+          className="editor-toolbar sticky top-0 z-40 overflow-x-auto overflow-y-visible flex gap-1 p-2"
         >
           {/* Text Formatting */}
-          <div className="flex items-center gap-1 border-r border-gray-300 dark:border-gray-600 pr-2 mr-2">
+          <div className="flex items-center gap-0.5 sm:gap-1 border-r border-gray-300 dark:border-gray-600 pr-1 sm:pr-2 mr-1 sm:mr-2 flex-shrink-0">
             <ToolbarButton icon={Bold} command="bold" tooltip="Bold (Ctrl+B)" />
             <ToolbarButton icon={Italic} command="italic" tooltip="Italic (Ctrl+I)" />
             <ToolbarButton icon={Underline} command="underline" tooltip="Underline (Ctrl+U)" />
           </div>
 
           {/* Alignment */}
-          <div className="flex items-center gap-1 border-r border-gray-300 dark:border-gray-600 pr-2 mr-2">
+          <div className="flex items-center gap-0.5 sm:gap-1 border-r border-gray-300 dark:border-gray-600 pr-1 sm:pr-2 mr-1 sm:mr-2 flex-shrink-0">
             <ToolbarButton icon={AlignLeft} command="justifyLeft" tooltip="Align Left" />
             <ToolbarButton icon={AlignCenter} command="justifyCenter" tooltip="Align Center" />
             <ToolbarButton icon={AlignRight} command="justifyRight" tooltip="Align Right" />
           </div>
 
           {/* Font Size */}
-          <div className="flex items-center gap-1 border-r border-gray-300 dark:border-gray-600 pr-2 mr-2">
+          <div className="flex items-center gap-0.5 sm:gap-1 border-r border-gray-300 dark:border-gray-600 pr-1 sm:pr-2 mr-1 sm:mr-2 flex-shrink-0">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -263,7 +263,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               type="button"
               title="Decrease font size"
             >
-              <span className="text-lg font-bold">−</span>
+              <span className="text-sm sm:text-lg font-bold">−</span>
             </motion.button>
             
             <input
@@ -283,7 +283,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   handleFontSize('72');
                 }
               }}
-              className="w-12 px-2 py-1 text-center text-sm bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400/50 focus:border-primary-400"
+              className="w-8 sm:w-12 px-1 sm:px-2 py-1 text-center text-xs sm:text-sm bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400/50 focus:border-primary-400"
               min="8"
               max="72"
               title="Font size"
@@ -301,12 +301,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               type="button"
               title="Increase font size"
             >
-              <span className="text-lg font-bold">+</span>
+              <span className="text-sm sm:text-lg font-bold">+</span>
             </motion.button>
           </div>
 
           {/* Color Picker */}
-          <div className="relative border-r border-gray-300 dark:border-gray-600 pr-2 mr-2">
+          <div className="relative border-r border-gray-300 dark:border-gray-600 pr-1 sm:pr-2 mr-1 sm:mr-2 flex-shrink-0">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -346,13 +346,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           </div>
 
           {/* Lists */}
-          <div className="flex items-center gap-1 border-r border-gray-300 dark:border-gray-600 pr-2 mr-2">
+          <div className="flex items-center gap-0.5 sm:gap-1 border-r border-gray-300 dark:border-gray-600 pr-1 sm:pr-2 mr-1 sm:mr-2 flex-shrink-0">
             <ToolbarButton icon={List} command="insertUnorderedList" tooltip="Bullet List" />
             <ToolbarButton icon={ListOrdered} command="insertOrderedList" tooltip="Numbered List" />
           </div>
 
           {/* Insert Elements */}
-          <div className="flex items-center gap-1 border-r border-gray-300 dark:border-gray-600 pr-2 mr-2">
+          <div className="flex items-center gap-0.5 sm:gap-1 border-r border-gray-300 dark:border-gray-600 pr-1 sm:pr-2 mr-1 sm:mr-2 flex-shrink-0">
             <ToolbarButton 
               icon={Link} 
               onClick={() => setIsLinkDialogOpen(true)} 
@@ -361,7 +361,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           </div>
 
           {/* History */}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
             <ToolbarButton 
               icon={Undo} 
               onClick={handleUndo}

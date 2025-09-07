@@ -293,14 +293,14 @@ const HomePage: React.FC = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               {/* Logo and Title */}
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2 sm:space-x-4">
                 <div className="flex items-center">
-                  <StickyNote size={32} className="text-primary-500" />
-                  <h1 className="ml-3 text-2xl font-semibold text-gray-900 dark:text-white">
+                  <StickyNote size={24} className="sm:w-8 sm:h-8 text-primary-500" />
+                  <h1 className="ml-2 sm:ml-3 text-lg sm:text-2xl font-semibold text-gray-900 dark:text-white">
                     Notes
                   </h1>
                 </div>
-                <div className="hidden md:flex items-center space-x-6 ml-8">
+                <div className="hidden lg:flex items-center space-x-6 ml-8">
                   <span className="text-sm text-gray-600 dark:text-gray-400">
                     <span className="font-medium text-gray-900 dark:text-white">{stats.totalNotes}</span> notes
                   </span>
@@ -314,41 +314,51 @@ const HomePage: React.FC = () => {
               </div>
 
               {/* Header Actions - Odoo style */}
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1 sm:space-x-2">
+                {/* Mobile Stats - Show on small screens */}
+                <div className="flex items-center space-x-3 lg:hidden">
+                  <span className="text-xs text-gray-600 dark:text-gray-400">
+                    <span className="font-medium text-gray-900 dark:text-white">{stats.totalNotes}</span>
+                  </span>
+                  <span className="text-xs text-gray-600 dark:text-gray-400">
+                    <span className="font-medium text-primary-500">{stats.pinnedNotes}</span>
+                  </span>
+                </div>
+
                 {/* Theme Toggle */}
                 <button
                   onClick={toggleDarkMode}
-                  className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                  className="p-1.5 sm:p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
                   title="Toggle theme"
                 >
-                  {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+                  {darkMode ? <Sun size={18} className="sm:w-5 sm:h-5" /> : <Moon size={18} className="sm:w-5 sm:h-5" />}
                 </button>
 
-                {/* API Key */}
+                {/* API Key - Hidden on mobile */}
                 <button
                   onClick={() => setShowApiKeyDialog(true)}
-                  className={`p-2 transition-colors ${
+                  className={`hidden sm:block p-1.5 sm:p-2 transition-colors ${
                     groqAIService.isReady() 
                       ? 'text-secondary-400 hover:text-secondary-500' 
                       : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
                   }`}
                   title="AI Settings"
                 >
-                  <Key size={20} />
+                  <Key size={18} className="sm:w-5 sm:h-5" />
                 </button>
 
-                {/* Export */}
+                {/* Export - Hidden on mobile */}
                 <button
                   onClick={handleExport}
-                  className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                  className="hidden sm:block p-1.5 sm:p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
                   title="Export notes"
                 >
-                  <Download size={20} />
+                  <Download size={18} className="sm:w-5 sm:h-5" />
                 </button>
                 
-                {/* Import */}
-                <label className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors cursor-pointer">
-                  <Upload size={20} />
+                {/* Import - Hidden on mobile */}
+                <label className="hidden sm:block p-1.5 sm:p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors cursor-pointer">
+                  <Upload size={18} className="sm:w-5 sm:h-5" />
                   <input
                     type="file"
                     accept=".json"
@@ -357,39 +367,39 @@ const HomePage: React.FC = () => {
                   />
                 </label>
 
-                <div className="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-2" />
+                <div className="hidden sm:block h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1 sm:mx-2" />
 
                 {/* View Mode Toggle */}
                 <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-md p-0.5">
                   <button
                     onClick={() => setViewMode('grid')}
-                    className={`px-3 py-1.5 rounded transition-colors text-sm font-medium ${
+                    className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded transition-colors text-sm font-medium ${
                       viewMode === 'grid'
                         ? 'bg-white dark:bg-gray-700 text-primary-500 shadow-sm'
                         : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                     }`}
                   >
-                    <Grid size={16} className="inline" />
+                    <Grid size={14} className="sm:w-4 sm:h-4 inline" />
                   </button>
                   <button
                     onClick={() => setViewMode('list')}
-                    className={`px-3 py-1.5 rounded transition-colors text-sm font-medium ${
+                    className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded transition-colors text-sm font-medium ${
                       viewMode === 'list'
                         ? 'bg-white dark:bg-gray-700 text-primary-500 shadow-sm'
                         : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                     }`}
                   >
-                    <List size={16} className="inline" />
+                    <List size={14} className="sm:w-4 sm:h-4 inline" />
                   </button>
                 </div>
 
                 {/* Create Note Button - Odoo style */}
                 <button
                   onClick={handleCreateNote}
-                  className="ml-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-md font-medium transition-colors flex items-center space-x-2"
+                  className="ml-1 sm:ml-2 px-2 sm:px-4 py-1.5 sm:py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-md font-medium transition-colors flex items-center space-x-1 sm:space-x-2"
                 >
-                  <Plus size={18} />
-                  <span className="hidden sm:inline">New Note</span>
+                  <Plus size={16} className="sm:w-5 sm:h-5" />
+                  <span className="hidden sm:inline text-sm sm:text-base">New Note</span>
                 </button>
               </div>
             </div>
@@ -397,38 +407,39 @@ const HomePage: React.FC = () => {
         </header>
 
         {/* Main Content Area */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           {/* Search and Filters - Odoo style */}
-          <div className="mb-6">
-            <div className="flex gap-3">
+          <div className="mb-4 sm:mb-6">
+            <div className="flex flex-col sm:flex-row gap-3">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                 <input
                   type="text"
                   placeholder="Search notes..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-10 py-2.5 bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-gray-900 dark:text-gray-100"
+                  className="w-full pl-9 sm:pl-10 pr-9 sm:pr-10 py-2 sm:py-2.5 bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-gray-900 dark:text-gray-100 text-sm sm:text-base"
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                   >
-                    <X size={18} />
+                    <X size={16} />
                   </button>
                 )}
               </div>
-
+              
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className={`px-4 py-2.5 rounded-md font-medium transition-colors flex items-center space-x-2 ${
+                className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-md font-medium transition-colors flex items-center justify-center space-x-2 ${
                   showFilters || selectedTags.length > 0
                     ? 'bg-primary-500 text-white hover:bg-primary-600'
                     : 'bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-elevated'
                 }`}
               >
-                <Filter size={18} />
+                <Filter size={16} />
+                <span className="text-sm sm:text-base">Filters</span>
                 {selectedTags.length > 0 && (
                   <span className="bg-white/20 px-1.5 py-0.5 rounded text-xs">
                     {selectedTags.length}
@@ -439,7 +450,7 @@ const HomePage: React.FC = () => {
 
             {/* Tag Filters - Odoo style */}
             <AnimatePresence>
-              {showFilters && allTags.length > 0 && (
+              {showFilters && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
@@ -450,33 +461,42 @@ const HomePage: React.FC = () => {
                   <div className="p-4 bg-white dark:bg-dark-surface border border-gray-200 dark:border-gray-700 rounded-md">
                     <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Filter by tags</p>
                     <div className="flex flex-wrap gap-2">
-                      {allTags.map((tag) => (
-                        <button
-                          key={tag}
-                          onClick={() => {
-                            setSelectedTags(prev =>
-                              prev.includes(tag)
-                                ? prev.filter(t => t !== tag)
-                                : [...prev, tag]
-                            );
-                          }}
-                          className={`px-3 py-1 rounded-full text-sm transition-colors ${
-                            selectedTags.includes(tag)
-                              ? 'bg-primary-500 text-white hover:bg-primary-600'
-                              : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-                          }`}
-                        >
-                          <Tag size={12} className="inline mr-1" />
-                          {tag}
-                        </button>
-                      ))}
-                      {selectedTags.length > 0 && (
-                        <button
-                          onClick={() => setSelectedTags([])}
-                          className="px-3 py-1 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                        >
-                          Clear all
-                        </button>
+                      {allTags.length > 0 ? (
+                        <>
+                          {allTags.map((tag) => (
+                            <button
+                              key={tag}
+                              onClick={() => {
+                                setSelectedTags(prev =>
+                                  prev.includes(tag)
+                                    ? prev.filter(t => t !== tag)
+                                    : [...prev, tag]
+                                );
+                              }}
+                              className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                                selectedTags.includes(tag)
+                                  ? 'bg-primary-500 text-white hover:bg-primary-600'
+                                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                              }`}
+                            >
+                              <Tag size={12} className="inline mr-1" />
+                              {tag}
+                            </button>
+                          ))}
+                          {selectedTags.length > 0 && (
+                            <button
+                              onClick={() => setSelectedTags([])}
+                              className="px-3 py-1 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                            >
+                              Clear all
+                            </button>
+                          )}
+                        </>
+                      ) : (
+                        <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 italic">
+                          <Tag size={16} />
+                          <span className="text-sm">No tags available</span>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -532,8 +552,8 @@ const HomePage: React.FC = () => {
           <div
             className={
               viewMode === 'grid'
-                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
-                : 'space-y-4'
+                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6'
+                : 'space-y-3 sm:space-y-4'
             }
           >
             {filteredNotes.map((note, index) => (
