@@ -281,7 +281,7 @@ const HomePage: React.FC = () => {
   const allTags = Array.from(new Set(notes.flatMap(note => note.tags)));
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-bg transition-colors duration-200">
+    <div className="min-h-screen bg-gray-100 dark:bg-dark-bg transition-colors duration-200">
       {/* Subtle gradient background - Odoo style */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-0 right-0 h-96 bg-gradient-to-b from-primary-50 to-transparent dark:from-primary-900/10" />
@@ -407,7 +407,7 @@ const HomePage: React.FC = () => {
         </header>
 
         {/* Main Content Area */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+        <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${viewMode === 'grid' ? 'py-2 sm:py-3' : 'py-4 sm:py-6'}`}>
           {/* Search and Filters - Odoo style */}
           <div className="mb-4 sm:mb-6">
             <div className="flex flex-col sm:flex-row gap-3">
@@ -552,7 +552,7 @@ const HomePage: React.FC = () => {
           <div
             className={
               viewMode === 'grid'
-                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6'
+                ? 'masonry-layout columns-1 md:columns-2 lg:columns-3 xl:columns-4'
                 : 'space-y-3 sm:space-y-4'
             }
           >

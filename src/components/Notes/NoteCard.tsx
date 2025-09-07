@@ -89,7 +89,7 @@ const NoteCard: React.FC<NoteCardProps> = ({
         duration: 0.15,
         delay: index * 0.02
       }}
-      className="relative group">
+      className="note-card relative group">
       <div
         className={`
           relative cursor-pointer

@@ -119,6 +119,17 @@
     @apply border-primary-300 dark:border-primary-700 shadow-md;
   }
   
+  /* Glass effect for AI button */
+  .glass {
+    @apply bg-white/80 backdrop-blur-sm border border-white/20;
+    @apply shadow-lg;
+  }
+  
+  .glass-dark {
+    @apply bg-dark-surface/80 backdrop-blur-sm border border-white/10;
+    @apply shadow-lg;
+  }
+  
   /* Note card animations */
   .note-card {
     @apply relative overflow-hidden;
@@ -133,6 +144,43 @@
   
   .note-card:hover::before {
     @apply translate-x-full;
+  }
+  
+  /* Masonry Layout */
+  .masonry-layout {
+    column-gap: 1rem;
+    column-fill: balance;
+  }
+  
+  .masonry-layout.columns-1 {
+    columns: 1;
+  }
+  
+  .masonry-layout.columns-2 {
+    columns: 2;
+  }
+  
+  .masonry-layout.columns-3 {
+    columns: 3;
+  }
+  
+  .masonry-layout.columns-4 {
+    columns: 4;
+  }
+  
+  .masonry-layout.columns-5 {
+    columns: 5;
+  }
+  
+  .masonry-layout.columns-6 {
+    columns: 6;
+  }
+  
+  /* Prevent breaking inside note cards */
+  .masonry-layout .note-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin-bottom: 1rem;
   }
 }
 
