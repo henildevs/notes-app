@@ -325,7 +325,7 @@ RULES:
 
       let cleanResponse = responseContent.trim();
       
-      const jsonMatch = cleanResponse.match(/\{.*\}/s);
+      const jsonMatch = cleanResponse.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         cleanResponse = jsonMatch[0];
       }
