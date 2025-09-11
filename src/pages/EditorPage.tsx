@@ -47,6 +47,9 @@ const EditorPage: React.FC = () => {
   const [lockPassword, setLockPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [generatedMeetLink, setGeneratedMeetLink] = useState<string | null>(null);
+  const [showMeetLinkDialog, setShowMeetLinkDialog] = useState(false);
+  const [showNoDateTimeDialog, setShowNoDateTimeDialog] = useState(false);
 
   const loadTheme = async () => {
     const prefs = await databaseService.getPreferences();
@@ -324,6 +327,30 @@ const EditorPage: React.FC = () => {
     } catch (error) {
       console.error('Failed to find glossary terms:', error);
       alert('Failed to find glossary terms. Please check your API key.');
+    } finally {
+      setAILoading(false);
+      setAILoadingFeature(null);
+    }
+  };
+
+  const handleMeetLink = async () => {
+    if (!note || !groqAIService.isReady()) return;
+    
+    setAILoading(true);
+    setAILoadingFeature('meet');
+    try {
+      const meetLink = await noteService.generateMeetLink(note.id);
+      if (meetLink === 'NO_DATE_TIME_DETECTED') {
+        setShowNoDateTimeDialog(true);
+      } else if (meetLink && meetLink !== 'Error Generating Link') {
+        setGeneratedMeetLink(meetLink);
+        setShowMeetLinkDialog(true);
+      } else {
+        alert('Failed to generate meet link. Please try again.');
+      }
+    } catch (error) {
+      console.error('Failed to generate meet link:', error);
+      alert('Failed to generate meet link. Please check your API key.');
     } finally {
       setAILoading(false);
       setAILoadingFeature(null);
@@ -904,6 +931,21 @@ const EditorPage: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
+              onClick={handleMeetLink}
+              disabled={aiLoading}
+              className="w-full px-4 py-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {aiLoading && aiLoadingFeature === 'meet' ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <BookOpen size={16} />
+              )}
+              <span>{aiLoading && aiLoadingFeature === 'meet' ? 'Generating...' : 'Generate Meet Link'}</span>
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => setShowTranslationPanel(true)}
               className="w-full px-4 py-3 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 mt-3"
             >
@@ -1056,6 +1098,127 @@ const EditorPage: React.FC = () => {
                   Enable AI
                 </motion.button>
               </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* Meet Link Dialog */}
+      {showMeetLinkDialog && generatedMeetLink && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowMeetLinkDialog(false)}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="bg-white dark:bg-dark-surface rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 w-full max-w-md mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <BookOpen size={20} className="text-green-500" />
+              Meet Link Generated
+            </h3>
+            
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              Your Google Meet link has been generated successfully!
+            </p>
+            
+            <div className="space-y-4">
+              <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-xl">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Generated Link:</p>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={generatedMeetLink}
+                    readOnly
+                    className="flex-1 px-3 py-2 bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none"
+                  />
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => navigator.clipboard.writeText(generatedMeetLink)}
+                    className="px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-semibold transition-colors"
+                    title="Copy to clipboard"
+                  >
+                    Copy
+                  </motion.button>
+                </div>
+              </div>
+              
+              <div className="flex gap-3">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setShowMeetLinkDialog(false)}
+                  className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200"
+                >
+                  Close
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => window.open(generatedMeetLink, '_blank')}
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+                >
+                  Open Meet
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* No Date/Time Detected Dialog */}
+      {showNoDateTimeDialog && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowNoDateTimeDialog(false)}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="bg-white dark:bg-dark-surface rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 w-full max-w-md mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <AlertCircle size={20} className="text-orange-500" />
+              No Date and Time Detected
+            </h3>
+            
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              We couldn't find a specific date and time for a meeting in your note. Please make sure your note contains clear meeting information like:
+            </p>
+            
+            <div className="space-y-2 mb-6">
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                • "Meeting on [date] at [time]"
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                • "Call tomorrow at 2 PM"
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                • "Scheduled for [date] [time]"
+              </div>
+            </div>
+            
+            <div className="flex gap-3">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setShowNoDateTimeDialog(false)}
+                className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200"
+              >
+                Close
+              </motion.button>
             </div>
           </motion.div>
         </motion.div>

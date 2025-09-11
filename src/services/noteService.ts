@@ -58,6 +58,12 @@ class NoteService {
     }, delay);
   }
 
+  async generateMeetLink(id: string): Promise<string> {
+    const note = await this.getNote(id);
+    if (!note) return '';
+    return await groqAIService.generateMeetLink(note.content);
+  }
+
   async deleteNote(id: string): Promise<void> {
     await databaseService.deleteNote(id);
   }

@@ -15,7 +15,10 @@ import {
   Moon,
   Sun,
   Key,
-  Lock
+  Lock,
+  Trash2,
+  CheckSquare,
+  Square
 } from 'lucide-react';
 import NoteCard from '../components/Notes/NoteCard';
 import { useSearch } from '../hooks/useSearch';
@@ -54,6 +57,8 @@ const HomePage: React.FC = () => {
     encryptedNotes: 0,
     totalTags: 0,
   });
+  const [selectedNotes, setSelectedNotes] = useState<Set<string>>(new Set());
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
 
   const { notes: searchResults, query: searchQuery, updateQuery, clearQuery } = useSearch(notes);
 
@@ -259,6 +264,52 @@ const HomePage: React.FC = () => {
     }
   };
 
+  const handleToggleSelection = (noteId: string) => {
+    setSelectedNotes(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(noteId)) {
+        newSet.delete(noteId);
+      } else {
+        newSet.add(noteId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectedNotes.size === filteredNotes.length) {
+      setSelectedNotes(new Set());
+    } else {
+      setSelectedNotes(new Set(filteredNotes.map(note => note.id)));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedNotes.size === 0) return;
+    
+    const confirmMessage = `Are you sure you want to delete ${selectedNotes.size} note${selectedNotes.size > 1 ? 's' : ''}? This action cannot be undone.`;
+    if (window.confirm(confirmMessage)) {
+      try {
+        const deletePromises = Array.from(selectedNotes).map(id => noteService.deleteNote(id));
+        await Promise.all(deletePromises);
+        await loadNotes();
+        await loadStats();
+        setSelectedNotes(new Set());
+        setIsSelectionMode(false);
+      } catch (error) {
+        console.error('Failed to delete notes:', error);
+        alert('Failed to delete some notes. Please try again.');
+      }
+    }
+  };
+
+  const toggleSelectionMode = () => {
+    setIsSelectionMode(!isSelectionMode);
+    if (isSelectionMode) {
+      setSelectedNotes(new Set());
+    }
+  };
+
   const allTags = Array.from(new Set(notes.flatMap(note => note.tags)));
 
   return (
@@ -397,6 +448,43 @@ const HomePage: React.FC = () => {
                   </button>
                 )}
               </div>
+
+              {/* Bulk Delete Button */}
+              <AnimatePresence>
+                {isSelectionMode && (
+                  <motion.div
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{ opacity: 1, width: 'auto' }}
+                    exit={{ opacity: 0, width: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex items-center gap-2"
+                  >
+                    <button
+                      onClick={handleSelectAll}
+                      className="px-3 py-2 bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-elevated rounded-md font-medium transition-colors flex items-center space-x-2"
+                      title={selectedNotes.size === filteredNotes.length ? "Deselect all" : "Select all"}
+                    >
+                      {selectedNotes.size === filteredNotes.length ? (
+                        <CheckSquare size={16} className="text-primary-500" />
+                      ) : (
+                        <Square size={16} className="text-gray-500" />
+                      )}
+                      <span className="text-sm">
+                        {selectedNotes.size === filteredNotes.length ? "All" : `${selectedNotes.size}/${filteredNotes.length}`}
+                      </span>
+                    </button>
+
+                    <button
+                      onClick={handleBulkDelete}
+                      disabled={selectedNotes.size === 0}
+                      className="px-3 py-2 bg-primary-500 hover:bg-primary-600 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-md font-medium transition-colors flex items-center space-x-2 shadow-lg hover:shadow-xl"
+                    >
+                      <Trash2 size={16} />
+                      <span className="text-sm">Delete Selected</span>
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
               
               <button
                 onClick={() => setShowFilters(!showFilters)}
@@ -413,6 +501,18 @@ const HomePage: React.FC = () => {
                     {selectedTags.length}
                   </span>
                 )}
+              </button>
+
+              <button
+                onClick={toggleSelectionMode}
+                className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-md font-medium transition-colors flex items-center justify-center space-x-2 ${
+                  isSelectionMode
+                    ? 'bg-primary-500 text-white hover:bg-primary-600'
+                    : 'bg-white dark:bg-dark-surface border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-elevated'
+                }`}
+              >
+                <Trash2 size={16} />
+                <span className="text-sm sm:text-base">Select</span>
               </button>
             </div>
 
@@ -532,6 +632,9 @@ const HomePage: React.FC = () => {
                 onDelete={() => handleDeleteNote(note.id)}
                 onTogglePin={() => handleTogglePin(note.id)}
                 onToggleEncrypt={() => handleToggleEncrypt(note.id)}
+                isSelected={selectedNotes.has(note.id)}
+                onToggleSelection={() => handleToggleSelection(note.id)}
+                isSelectionMode={isSelectionMode}
               />
             ))}
           </div>

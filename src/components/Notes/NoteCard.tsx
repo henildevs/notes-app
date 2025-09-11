@@ -9,7 +9,9 @@ import {
   Trash2,
   Copy,
   Unlock,
-  Sparkles
+  Sparkles,
+  CheckSquare,
+  Square
 } from 'lucide-react';
 import { Note } from '../../types';
 
@@ -21,6 +23,8 @@ interface NoteCardProps {
   onTogglePin: () => void;
   onToggleEncrypt: () => void;
   isSelected?: boolean;
+  onToggleSelection?: () => void;
+  isSelectionMode?: boolean;
   index?: number;
 }
 
@@ -32,6 +36,8 @@ const NoteCard: React.FC<NoteCardProps> = ({
   onTogglePin,
   onToggleEncrypt,
   isSelected = false,
+  onToggleSelection,
+  isSelectionMode = false,
   index = 0,
 }) => {
   const [showMenu, setShowMenu] = React.useState(false);
@@ -113,9 +119,26 @@ const NoteCard: React.FC<NoteCardProps> = ({
 
         <div className="p-3 sm:p-4">
           <div className="flex items-start justify-between mb-2">
-            <h3 className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base line-clamp-1 flex-1 pr-16 sm:pr-20">
-              {getDisplayTitle()}
-            </h3>
+            <div className="flex items-start gap-2 flex-1">
+              {isSelectionMode && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleSelection?.();
+                  }}
+                  className="mt-0.5 p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"
+                >
+                  {isSelected ? (
+                    <CheckSquare size={16} className="text-primary-500" />
+                  ) : (
+                    <Square size={16} className="text-gray-400" />
+                  )}
+                </button>
+              )}
+              <h3 className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base line-clamp-1 flex-1 pr-16 sm:pr-20">
+                {getDisplayTitle()}
+              </h3>
+            </div>
             
             <div className="relative ml-2">
               <button

@@ -289,6 +289,69 @@ class GroqAIService {
       return 'Unable to fetch definition';
     }
   }
+  async generateMeetLink(content: string): Promise<string> {
+    if (!this.groq) {
+      throw new Error('Groq AI service not initialized');
+    }
+    
+    try {
+      const response = await this.groq.chat.completions.create({
+        messages: [
+          {
+            role: 'system',
+            content: `You are a JSON-only response assistant. You MUST respond with ONLY valid JSON, no other text.
+
+TASK: Analyze text for meeting date and time, then respond with JSON.
+
+RULES:
+1. Look for clear date AND time patterns: "meeting on [date] at [time]", "call tomorrow at 2 PM", "scheduled for [date] [time]"
+2. If date AND time found: {"hasDateTime": true, "meetLink": "https://meet.google.com/abc-def-ghi"}
+3. If no clear date/time: {"hasDateTime": false, "message": "No date and time detected"}
+4. Meet link format: https://meet.google.com/[3letters]-[3letters]-[3letters]
+5. RESPOND WITH ONLY JSON, NO OTHER TEXT`
+          },
+          {
+            role: 'user',
+            content: `Analyze this text for meeting date and time:\n\n${content}\n\nRespond with JSON only.`
+          }
+        ],
+        model: 'llama-3.1-8b-instant',
+        temperature: 0.1,
+        max_tokens: 100,
+      });
+      
+      const responseContent = response.choices[0]?.message?.content;
+      if (!responseContent) return 'Error Generating Link';
+
+      let cleanResponse = responseContent.trim();
+      
+      const jsonMatch = cleanResponse.match(/\{.*\}/s);
+      if (jsonMatch) {
+        cleanResponse = jsonMatch[0];
+      }
+
+      try {
+        const jsonResponse = JSON.parse(cleanResponse);
+        
+        if (jsonResponse.hasDateTime === false) {
+          return 'NO_DATE_TIME_DETECTED';
+        }
+        
+        if (jsonResponse.hasDateTime === true && jsonResponse.meetLink) {
+          return jsonResponse.meetLink;
+        }
+        
+        return 'NO_DATE_TIME_DETECTED';
+      } catch (error) {
+        console.error('Failed to parse meet link response:', error);
+        console.error('Raw response:', responseContent);
+        return 'NO_DATE_TIME_DETECTED';
+      }
+    } catch (error) {
+      console.error('Failed to generate meet link:', error);
+      throw error;
+    }
+  }
   
   async improveWriting(content: string): Promise<string> {
     if (!this.groq) {
@@ -319,5 +382,7 @@ class GroqAIService {
     }
   }
 }
+
+
 
 export const groqAIService = new GroqAIService();
